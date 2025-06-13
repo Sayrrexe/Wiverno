@@ -1,28 +1,40 @@
-class PageNotFound404:
-    def __call__(self):
-        return "404 WHAT", "Page not found"
-    
-class Wiverno:
-    
-    def __init__(self, routes_list):
-        self.routes_list = routes_list
-    
-    def __call__(self, environ, start_response):
-        # Extract the path from the environment
-        path = environ['PATH_INFO']
-        
-        
-        # add close /
-        if not path.endswith('/'):
-            path = path + '/'
-            
-        # see if the path matches any route
-        if path in self.routes_list:
-            view = self.routes_list[path]
-        else:
-            view = PageNotFound404()
+from typing import Callable, Dict, Any
+from wiverno.requests import PostRequest, GetRequest
 
-        # start the controller
+
+class PageNotFound404:
+    def __call__(self) -> tuple[str, str]:
+        return "404 WHAT", "Page not found"
+
+
+class Wiverno:
+    """
+    A simple WSGI-compatible web framework.
+    
+    Args:
+        routes_list (dict): A mapping of paths to view callables.
+    """
+
+    def __init__(self, routes_list: Dict[str, Callable[[], tuple[str, str]]]):
+        self.routes_list = routes_list
+
+    def __call__(self, environ: dict, start_response: Callable) -> list[bytes]:
+        path: str = environ.get('PATH_INFO', '/')
+
+        if not path.endswith('/'):
+            path += '/'
+
+        request: Dict[str, Any] = {'method': environ.get('REQUEST_METHOD', 'GET')}
+
+        if request['method'] == 'POST':
+            request['data'] = PostRequest().get_request_params(environ)
+            print(f"POST Request data: {request['data']}")
+        elif request['method'] == 'GET':
+            request['data'] = GetRequest().get_request_params(environ)
+            print(f"GET Request data: {request['data']}")
+
+        view = self.routes_list.get(path, PageNotFound404())
         code, body = view()
+
         start_response(code, [('Content-Type', 'text/html')])
         return [body.encode('utf-8')]
