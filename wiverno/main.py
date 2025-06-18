@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Any
+from typing import Callable, Dict, Any, List, Tuple
 from wiverno.requests import PostRequest, GetRequest
 
 
@@ -15,8 +15,14 @@ class Wiverno:
         routes_list (dict): A mapping of paths to view callables.
     """
 
-    def __init__(self, routes_list: Dict[str, Callable[[dict], tuple[str, str]]]):
-        self.routes_list = routes_list
+    def __init__(self, routes_list: List[Tuple[str, Callable[[dict], tuple[str, str]]]]):
+        """
+        Initializes the Wiverno application with a list of routes.
+
+        Args:
+            routes_list (dict): A dictionary mapping URL paths to view functions.
+        """
+        self.routes_list: Dict[str, Callable[[dict], tuple[str, str]]] = dict(routes_list)
 
     def __call__(self, environ: dict, start_response: Callable) -> list[bytes]:
         print("Wiverno is running...")
