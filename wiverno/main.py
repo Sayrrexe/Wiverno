@@ -20,7 +20,7 @@ class Wiverno:
         Initializes the Wiverno application with a list of routes.
 
         Args:
-            routes_list (dict): A dictionary mapping URL paths to view functions.
+            routes_list (List[Tuple[str, Callable]]): list of routes in the form of tuples (path, function).
         """
         self.routes_list: Dict[str, Callable[[dict], tuple[str, str]]] = dict(routes_list)
 
