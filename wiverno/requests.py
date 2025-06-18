@@ -1,10 +1,10 @@
 import json
-from typing import Dict, Any
-from urllib.parse import parse_qs
+from typing import Dict, Any, Optional
+from urllib.parse import parse_qs, unquote
 from email.parser import BytesParser
 from email.policy import default
 
-class GetRequest:
+class ParseQuery:
 
     @staticmethod
     def parse_input_data(data: str) -> dict:
@@ -37,9 +37,9 @@ class GetRequest:
         :return: A dictionary with parsed query parameters.
         """
         query_string = environ.get('QUERY_STRING', '')
-        return GetRequest.parse_input_data(query_string)
+        return ParseQuery.parse_input_data(query_string)
     
-class PostRequest:
+class ParseBody:
     """
     Handles parsing of POST request data from the WSGI environment.
     Supports: multipart/form-data, application/x-www-form-urlencoded, application/json.
@@ -56,7 +56,11 @@ class PostRequest:
             dict: Parsed POST data.
         """
         content_type: str = environ.get('CONTENT_TYPE', '')
-        content_length: int = int(environ.get('CONTENT_LENGTH', 0))
+        content_length_str = environ.get('CONTENT_LENGTH', '0')
+        try:
+            content_length = int(content_length_str)
+        except ValueError:
+            content_length = 0
         wsgi_input: bytes = environ['wsgi.input'].read(content_length)
 
         if content_type.startswith('multipart/form-data'):
@@ -78,3 +82,66 @@ class PostRequest:
             return json.loads(wsgi_input.decode())
 
         return {}
+    
+class HeaderParser:
+    """
+    A utility class to parse headers from the WSGI environment.
+    """
+
+    @staticmethod
+    def get_headers(environ: dict) -> Dict[str, str]:
+        """
+        Parses headers from the WSGI environment.
+
+        Args:
+            environ (dict): The WSGI environment.
+
+        Returns:
+            dict: Parsed headers.
+        """
+        headers = {}
+        for key, value in environ.items():
+            if key.startswith('HTTP_'):
+                header_name = key[5:].replace('_', '-').title()
+                headers[header_name] = value
+        return headers
+    
+class Request:
+    
+    def __init__(self, environ: dict):
+        self.environ = environ
+
+        self.method: str = environ.get("REQUEST_METHOD", "GET").upper()
+        self.path: str = self._get_path()
+        self.headers: Dict[str, str] = HeaderParser.get_headers(environ)
+        self.query_params: Dict[str, Any] = ParseQuery.get_request_params(environ)
+        self.data: Dict[str, Any] = ParseBody().get_request_params(environ)
+        self.cookies: Dict[str, str] = self._parse_cookies()
+        self.content_type: str = environ.get("CONTENT_TYPE", "")
+        self.content_length: int = self._parse_content_length()
+        self.client_ip: str = environ.get("REMOTE_ADDR", "")
+        self.server: str = environ.get("SERVER_NAME", "")
+        self.user_agent: str = self.headers.get("User-Agent", "")
+        self.protocol: str = environ.get("SERVER_PROTOCOL", "")
+        self.scheme: str = environ.get("wsgi.url_scheme", "http")
+        self.is_secure: bool = self.scheme == "https"
+        print(f"Request created: {self.method} {self.path}")
+        
+    def _get_path(self) -> str:
+        path = self.environ.get("PATH_INFO", "/")
+        return unquote(path if path.endswith("/") else path + "/")
+
+    def _parse_content_length(self) -> int:
+        try:
+            return int(self.environ.get("CONTENT_LENGTH", "0"))
+        except (ValueError, TypeError):
+            return 0
+
+    def _parse_cookies(self) -> Dict[str, str]:
+        cookie_str = self.environ.get("HTTP_COOKIE", "")
+        cookies = {}
+        for pair in cookie_str.split("; "):
+            if "=" in pair:
+                key, value = pair.split("=", 1)
+                cookies[key] = value
+        return cookies
