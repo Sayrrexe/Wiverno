@@ -1,3 +1,5 @@
+import traceback
+
 from typing import Callable, Dict, Any, List, Tuple
 from wiverno.requests import PostRequest, GetRequest
 
@@ -15,7 +17,9 @@ class Wiverno:
         routes_list (dict): A mapping of paths to view callables.
     """
 
-    def __init__(self, routes_list: List[Tuple[str, Callable[[dict], tuple[str, str]]]]):
+    def __init__(self, 
+                 routes_list: List[Tuple[str, Callable[[dict], tuple[str, str]]]], 
+                 page_404: Callable[[dict], tuple[str, str]] = PageNotFound404()):
         """
         Initializes the Wiverno application with a list of routes.
 
@@ -23,9 +27,9 @@ class Wiverno:
             routes_list (List[Tuple[str, Callable]]): list of routes in the form of tuples (path, function).
         """
         self.routes_list: Dict[str, Callable[[dict], tuple[str, str]]] = dict(routes_list)
+        self.page_404 = page_404
 
     def __call__(self, environ: dict, start_response: Callable) -> list[bytes]:
-        print("Wiverno is running...")
         path: str = environ.get('PATH_INFO', '/')
 
         if not path.endswith('/'):
@@ -40,15 +44,13 @@ class Wiverno:
 
         
         try:
-            view = self.routes_list.get(path, PageNotFound404())
+            view = self.routes_list.get(path, self.page_404)
             code, body = view(request)
-            if not body:
-                body = "<h1>Page not found</h1>"
-                code = "404 NOT FOUND"
         except Exception as e:
-            print(f"Error: {e}")
+            print("Error:", e)
+            traceback.print_exc()
             body = "<h1>Internal Server Error</h1>"
-            code = "500 INTERNAL SERVER ERROR" 
+            code = "500 INTERNAL SERVER ERROR"
             
         start_response(code, [('Content-Type', 'text/html')])
         return [body.encode('utf-8')]
