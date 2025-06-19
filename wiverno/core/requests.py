@@ -7,26 +7,8 @@ from email.policy import default
 class ParseQuery:
 
     @staticmethod
-    def parse_input_data(data: str) -> dict:
-        """
-        Parses the input data from a GET request query string into a dictionary.
-        
-        :param data: The query string from the GET request.
-        :return: A dictionary with key-value pairs from the query string.
-        """
-        if not data:
-            return {}
-        
-        # Split the query string into key-value pairs
-        pairs = data.split('&')
-        result = {}
-        for pair in pairs:
-            if '=' in pair:
-                key, value = pair.split('=')
-                result[key] = value
-            else:
-                result[pair] = None
-        return result
+    def parse_input_data(data: str) -> Dict[str, str]:
+        return {k: v[0] for k, v in parse_qs(data).items()}
     
     @staticmethod
     def get_request_params(environ: dict) -> dict:
@@ -44,42 +26,41 @@ class ParseBody:
     Handles parsing of POST request data from the WSGI environment.
     Supports: multipart/form-data, application/x-www-form-urlencoded, application/json.
     """
-
-    def get_request_params(self, environ: dict) -> Dict[str, Any]:
+    
+    @staticmethod
+    def get_request_params(environ: dict, raw_data: bytes) -> Dict[str, Any]:
         """
         Parses POST request data from the WSGI environment.
 
         Args:
             environ (dict): The WSGI environment.
+            raw_data (bytes): Raw POST body from wsgi.input.
 
         Returns:
-            dict: Parsed POST data.
+            Dict[str, Any]: Parsed POST data.
         """
         content_type: str = environ.get('CONTENT_TYPE', '')
-        content_length_str = environ.get('CONTENT_LENGTH', '0')
-        try:
-            content_length = int(content_length_str)
-        except ValueError:
-            content_length = 0
-        wsgi_input: bytes = environ['wsgi.input'].read(content_length)
 
-        if content_type.startswith('multipart/form-data'):
-            boundary = content_type.split('boundary=')[-1]
-            content: bytes = b'Content-Type: ' + content_type.encode() + b'\r\n\r\n' + wsgi_input
+        if content_type.startswith('multipart/form-data') and 'boundary=' in content_type:
+            boundary: str = content_type.split('boundary=')[-1]
+            content: bytes = b'Content-Type: ' + content_type.encode() + b'\r\n\r\n' + raw_data
             msg = BytesParser(policy=default).parsebytes(content)
 
             data: Dict[str, Any] = {}
             for part in msg.iter_parts():
-                name = part.get_param('name', header='content-disposition')
+                name: Optional[str] = part.get_param('name', header='content-disposition')
                 if name:
                     data[name] = part.get_content()
             return data
 
         elif content_type == 'application/x-www-form-urlencoded':
-            return {k: v[0] for k, v in parse_qs(wsgi_input.decode()).items()}
+            return {k: v[0] for k, v in parse_qs(raw_data.decode()).items()}
 
         elif content_type == 'application/json':
-            return json.loads(wsgi_input.decode())
+            try:
+                return json.loads(raw_data.decode())
+            except json.JSONDecodeError:
+                return {}
 
         return {}
     
@@ -107,6 +88,20 @@ class HeaderParser:
         return headers
     
 class Request:
+    method: str
+    path: str
+    headers: Dict[str, str]
+    query_params: Dict[str, Any]
+    data: Dict[str, Any]
+    cookies: Dict[str, str]
+    content_type: str
+    content_length: int
+    client_ip: str
+    server: str
+    user_agent: str
+    protocol: str
+    scheme: str
+    is_secure: bool
     
     def __init__(self, environ: dict):
         self.environ = environ
@@ -115,7 +110,8 @@ class Request:
         self.path: str = self._get_path()
         self.headers: Dict[str, str] = HeaderParser.get_headers(environ)
         self.query_params: Dict[str, Any] = ParseQuery.get_request_params(environ)
-        self.data: Dict[str, Any] = ParseBody().get_request_params(environ)
+        self._raw_data = environ['wsgi.input'].read(self._parse_content_length())
+        self.data = ParseBody.get_request_params(environ, self._raw_data)
         self.cookies: Dict[str, str] = self._parse_cookies()
         self.content_type: str = environ.get("CONTENT_TYPE", "")
         self.content_length: int = self._parse_content_length()

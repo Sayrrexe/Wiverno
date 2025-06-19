@@ -23,11 +23,14 @@ class RunServer:
         self.host: str = host
         self.port: int = port
         self.application: Callable = application
-
+        
     def start(self) -> None:
         """
         Starts the WSGI server and serves the application forever.
         """
-        with make_server(self.host, self.port, self.application) as httpd:
-            print(f"Serving on http://{self.host}:{self.port} ...")
-            httpd.serve_forever()
+        try:
+            with make_server(self.host, self.port, self.application) as httpd:
+                print(f"Serving on http://{self.host}:{self.port} ...")
+                httpd.serve_forever()
+        except KeyboardInterrupt:
+            print("\nServer stopped by user.")
