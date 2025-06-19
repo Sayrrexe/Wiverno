@@ -125,7 +125,6 @@ class Request:
         self.protocol: str = environ.get("SERVER_PROTOCOL", "")
         self.scheme: str = environ.get("wsgi.url_scheme", "http")
         self.is_secure: bool = self.scheme == "https"
-        print(f"Request created: {self.method} {self.path}")
         
     def _get_path(self) -> str:
         path = self.environ.get("PATH_INFO", "/")

@@ -14,7 +14,7 @@ def render(template_name: str, content: dict = {}, folder: str = "templates", **
     env = Environment()
     
     # Define the base directory of the project
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    base_dir = os.getcwd()
 
     # Set the loader to the templates folder within the my_app directory
     env.loader = FileSystemLoader(os.path.join(base_dir, 'my_app', folder))

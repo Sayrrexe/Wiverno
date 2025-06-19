@@ -2,7 +2,7 @@ import traceback
 import logging
 
 from typing import Callable, Dict, List, Tuple
-from wiverno.requests import Request
+from wiverno.core.requests import Request
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,6 @@ class Wiverno:
         request = Request(environ)
         try:
             view = self.routes_list.get(request.path, self.page_404)
-            print("Request 2")
             status, body = view(request)
         except Exception as e:
             logger.exception("Unhandled exception in view handler")
