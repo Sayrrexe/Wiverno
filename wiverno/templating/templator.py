@@ -21,6 +21,7 @@ def render(template_name: str, content: dict = {}, folder: str = "templates", **
     
     # Load the template 
     template = env.get_template(template_name)
+    
     # Check if the template exists
     if not template:
         raise FileNotFoundError(f"Template '{template_name}' not found in folder '{folder}'.")

@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 class PageNotFound404:
     
-    def __call__(self, request: Request = None) -> tuple[str, str]:
-        system_template_path = "wiverno\\base\\templates"
+    def __call__(self, request: Request = None) -> Tuple[str, str]:
+        system_template_path = "wiverno\\static\\templates"
         return "404 WHAT", render('error_404.html', folder=system_template_path)
 
 
@@ -25,7 +25,7 @@ class Wiverno:
         routes_list: List[Tuple[str, Callable[[Request], Tuple[str, str]]]],
         page_404: Callable[[Request], Tuple[str, str]] = PageNotFound404(),
         debug_mode: bool = True,
-        system_template_path: str = "wiverno\\base\\templates",
+        system_template_path: str = "wiverno\\static\\templates",
         page_500: Callable[[Request], Tuple[str, str]] = None
     ):
         """
@@ -45,17 +45,21 @@ class Wiverno:
         self.page_500: Callable[[Request], Tuple[str, str]] = page_500
 
 
-    def __call__(self, environ: dict, start_response: Callable[[str, List[Tuple[str, str]]], None]) -> List[bytes]:
+    def __call__(self, 
+                 environ: dict, 
+                 start_response: Callable[[str, List[Tuple[str, str]]], None]
+                 ) -> List[bytes]:
         request = Request(environ)
         try:
             view = self.routes_list.get(request.path, self.page_404)
             status, body = view(request)
-        except Exception as e:
+        except Exception:
             logger.exception("Unhandled exception in view handler")
             if self.page_500:
                 status, body = self.page_500(request)
-            status = "500 INTERNAL SERVER ERROR"
-            body = render('error_500.html', content = {"debug": self.debug, 'traceback': traceback.format_exc()}, folder=self.system_template_path)
+            else:
+                status = "500 INTERNAL SERVER ERROR"
+                body = render('error_500.html', content = {"debug": self.debug, 'traceback': traceback.format_exc()}, folder=self.system_template_path)
 
         start_response(status, [("Content-Type", "text/html; charset=utf-8")])
         return [body.encode("utf-8")]
