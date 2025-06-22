@@ -17,7 +17,7 @@ class PageNotFound404:
 
     def __call__(self, request):
         templator = Templator(folder=str(DEFAULT_TEMPLATE_PATH))
-        return "404 WHAT", templator.render('error_404.html')
+        return "404 NOT FOUND", templator.render('error_404.html')
 
 class MethodNotAllowed405:
 
@@ -53,7 +53,7 @@ class Wiverno:
         """
         self.routes_list: Dict[str, Callable[[Request], Tuple[str, str]]] = dict(routes_list)
         self.page_404: Callable[[Request], Tuple[str, str]] = page_404 
-        self.system_templator: str = Templator(folder=system_template_path)
+        self.system_templator: Templator = Templator(folder=system_template_path)
         self.debug: bool = debug_mode
         self.page_500: Callable[[Request], Tuple[str, str]] = page_500
 
