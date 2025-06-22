@@ -1,0 +1,23 @@
+from setuptools import setup, find_packages
+from pathlib import Path
+
+# Read version from package
+version = "0.0.0"
+
+with open(Path(__file__).resolve().parent / 'wiverno' / '__init__.py') as f:
+    for line in f:
+        if line.startswith('__version__'):
+            version = line.split('=')[1].strip().strip('"')
+            break
+
+setup(
+    name='wiverno',
+    version=version,
+    packages=find_packages(),
+    install_requires=[
+        'Jinja2==3.1.6',
+        'MarkupSafe==3.0.2'
+    ],
+    python_requires='>=3.8',
+    description='A lightweight WSGI framework',
+)
