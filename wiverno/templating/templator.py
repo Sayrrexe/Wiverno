@@ -10,7 +10,7 @@ class Templator:
         # Load templates from the provided folder relative to the package
         self.env.loader = FileSystemLoader(self.base_dir / folder)
         
-    def render(self, template_name: str, content: dict = {}, **kwargs):
+    def render(self, template_name: str, content: Optional[dict] = None, **kwargs):
         """
         Render a template with the given context.
 
