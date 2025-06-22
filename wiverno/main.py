@@ -1,5 +1,6 @@
 import traceback
 import logging
+from pathlib import Path
 
 from typing import Callable, Dict, List, Tuple
 from wiverno.core.requests import Request
@@ -8,16 +9,20 @@ from wiverno.templating.templator import Templator
 logger = logging.getLogger(__name__)
 
 
+BASE_DIR = Path(__file__).resolve().parent
+DEFAULT_TEMPLATE_PATH = BASE_DIR / "static" / "templates"
+
+
 class PageNotFound404:
-    
+
     def __call__(self, request):
-        templator = Templator(folder="wiverno\\static\\templates")
+        templator = Templator(folder=str(DEFAULT_TEMPLATE_PATH))
         return "404 WHAT", templator.render('error_404.html')
 
 class MethodNotAllowed405:
-    
+
     def __call__(self, request):
-        templator = Templator(folder="wiverno/static/templates")
+        templator = Templator(folder=str(DEFAULT_TEMPLATE_PATH))
         return "405 METHOD NOT ALLOWED", templator.render(
             "error_405.html", content={"method": request.method}
         )
@@ -33,7 +38,7 @@ class Wiverno:
         routes_list: List[Tuple[str, Callable[[Request], Tuple[str, str]]]],
         page_404: Callable[[Request], Tuple[str, str]] = PageNotFound404(),
         debug_mode: bool = True,
-        system_template_path: str = "wiverno\\static\\templates",
+        system_template_path: str = str(DEFAULT_TEMPLATE_PATH),
         page_500: Callable[[Request], Tuple[str, str]] = None
     ):
         """

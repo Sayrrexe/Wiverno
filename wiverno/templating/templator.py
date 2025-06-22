@@ -1,14 +1,15 @@
 import os
+from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
 class Templator:
     def __init__(self, folder: str = "templates"):
-        
+
         self.env = Environment()
-        # Define the base directory of the project
-        self.base_dir = os.getcwd()
-        # Set the loader to the templates folder within the my_app directory
-        self.env.loader = FileSystemLoader(os.path.join(self.base_dir, folder))
+        # Base directory of the framework package
+        self.base_dir = Path(__file__).resolve().parent
+        # Load templates from the provided folder relative to the package
+        self.env.loader = FileSystemLoader(self.base_dir / folder)
         
     def render(self, template_name: str, content: dict = {}, **kwargs):
         """
@@ -16,8 +17,7 @@ class Templator:
 
         :param template_name: Name of the template file to render.
         :param content: Context data to pass to the template.
-        :param folder: Folder where the template is located.
-        :param kwargs: Context variables to pass to the template.
+        :param kwargs: Additional context variables.
         :return: Rendered HTML as a string.
         """
         # Load the template 
