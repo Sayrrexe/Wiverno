@@ -320,7 +320,6 @@ class Wiverno:
         
         try:
             handler, method_allowed = self._match_route(request)
-            print(handler, method_allowed)
             
             if handler is None:
                 status, body = self.page_404(request)

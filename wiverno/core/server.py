@@ -1,5 +1,8 @@
 from wsgiref.simple_server import make_server
 from typing import Callable
+import logging
+
+logger = logging.getLogger(__name__)
 
 class RunServer:
     """
@@ -32,7 +35,7 @@ class RunServer:
         """
         try:
             with make_server(self.host, self.port, self.application) as httpd:
-                print(f"Serving on http://{self.host}:{self.port} ...")
+                logger.info(f"Serving on http://{self.host}:{self.port} ...")
                 httpd.serve_forever()
         except KeyboardInterrupt:
-            print("\nServer stopped by user.")
+            logger.info("Server stopped by user.")

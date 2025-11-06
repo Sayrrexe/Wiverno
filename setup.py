@@ -15,7 +15,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'Jinja2==3.1.6',
-        'MarkupSafe==3.0.2'
+        'MarkupSafe==3.0.3'
     ],
     python_requires='>=3.8',
     description='A lightweight WSGI framework',
