@@ -106,7 +106,8 @@ class Wiverno:
             for path, handler in routes_list:
                 self._routes[path] = {
                     'handler': handler,
-                    'methods': None 
+                    'methods': None # 'methods': None means all HTTP methods are allowed for this route,
+                    # consistent with the behavior in route matching logic.
                 }
         self.system_templator = Templator(folder=system_template_path)
         self.debug = debug_mode
