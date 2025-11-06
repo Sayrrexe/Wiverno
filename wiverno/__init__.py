@@ -1,3 +1,9 @@
-"""Wiverno framework package."""
+"""
+Wiverno - A lightweight Python web framework
+"""
 
-__version__ = "0.1.1"
+try:
+    from importlib.metadata import version
+    __version__ = version("wiverno")
+except Exception:
+    __version__ = "0.0.0-dev"

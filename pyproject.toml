@@ -1,13 +1,13 @@
 [project]
 name = "wiverno"
-version = "0.1.1"
-description = "A modern Python web framework"
+version = "0.1.2"
+description = "A lightweight WSGI framework for building fast and flexible Python web applications"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.12"
 authors = [
     { name = "Sayrrexe" }
 ]
-license = { text = "MIT" }
 keywords = ["web", "framework", "wsgi"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -89,26 +89,40 @@ minversion = "8.0"
 testpaths = ["tests"]
 pythonpath = ["."]
 addopts = [
-    "-ra",
-    "--strict-markers",
-    "--strict-config",
-    "--showlocals",
+    "-ra",                          # Show summary for all test outcomes
+    "--strict-markers",             # Strict marker validation
+    "--strict-config",              # Strict config validation
+    "--showlocals",                 # Show local variables on failure
+    "-v",                           # Verbose output
+    "--tb=short",                   # Short traceback format
+    "--cov=wiverno",               # Measure coverage for wiverno package
+    "--cov-report=term-missing",    # Show missing lines in terminal
+    "--cov-report=html",            # HTML report
+    "--cov-report=xml",             # XML report for CI/CD
+    "--cov-fail-under=50",          # Minimum coverage 50%
 ]
 markers = [
+    "unit: marks tests as unit tests (fast, isolated)",
+    "integration: marks tests as integration tests (slower, multiple components)",
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
+    "benchmark: marks tests as performance benchmarks",
 ]
 
 [tool.coverage.run]
 source = ["wiverno"]
 omit = [
     "*/tests/*",
+    "*/test_*.py",
     "*/__pycache__/*",
     "*/venv/*",
     "*/.venv/*",
 ]
+branch = true  # Enable branch coverage
 
 [tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
@@ -118,6 +132,9 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     "@abstractmethod",
 ]
+
+[tool.coverage.html]
+directory = "htmlcov"
 
 [tool.mypy]
 python_version = "3.12"

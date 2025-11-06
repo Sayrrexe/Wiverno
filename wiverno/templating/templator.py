@@ -20,7 +20,7 @@ class Templator:
                 the current working directory. Defaults to "templates".
         """
 
-        self.env = Environment()
+        self.env = Environment(autoescape=True)
         self.base_dir = os.getcwd()
         self.env.loader = FileSystemLoader(os.path.join(self.base_dir, folder))
 
