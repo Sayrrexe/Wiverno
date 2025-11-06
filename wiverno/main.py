@@ -134,7 +134,7 @@ class Wiverno:
 
             self._routes[normalized_path] = {
                 'handler': func,
-                'methods': methods
+                'methods': methods or ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
             }
             return func
         return decorator
