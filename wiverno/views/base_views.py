@@ -1,5 +1,6 @@
 from wiverno.main import MethodNotAllowed405
 
+
 class BaseView:
     """
     Base class for class-based views.

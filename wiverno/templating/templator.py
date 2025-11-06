@@ -1,8 +1,7 @@
 import os
 
-from pathlib import Path
-from typing import Optional
 from jinja2 import Environment, FileSystemLoader
+
 
 class Templator:
     """
@@ -24,8 +23,8 @@ class Templator:
         self.env = Environment()
         self.base_dir = os.getcwd()
         self.env.loader = FileSystemLoader(os.path.join(self.base_dir, folder))
-        
-    def render(self, template_name: str, content: Optional[dict] = None, **kwargs):
+
+    def render(self, template_name: str, content: dict | None = None, **kwargs):
         """
         Renders a template with the given context.
 
