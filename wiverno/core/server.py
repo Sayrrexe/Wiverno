@@ -27,6 +27,8 @@ class RunServer:
     def start(self) -> None:
         """
         Starts the WSGI server and serves the application forever.
+
+        The server will continue running until interrupted by KeyboardInterrupt (Ctrl+C).
         """
         try:
             with make_server(self.host, self.port, self.application) as httpd:

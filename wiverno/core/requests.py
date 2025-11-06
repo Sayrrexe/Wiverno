@@ -5,18 +5,33 @@ from email.parser import BytesParser
 from email.policy import default
 
 class ParseQuery:
+    """
+    Utility class for parsing query strings from URLs.
+    """
 
     @staticmethod
     def parse_input_data(data: str) -> Dict[str, str]:
+        """
+        Parses a query string into a dictionary.
+
+        Args:
+            data (str): The query string to parse.
+
+        Returns:
+            Dict[str, str]: A dictionary mapping parameter names to their first values.
+        """
         return {k: v[0] for k, v in parse_qs(data).items()}
     
     @staticmethod
     def get_request_params(environ: dict) -> dict:
         """
         Retrieves and parses the query string from the WSGI environment.
-        
-        :param environ: The WSGI environment dictionary.
-        :return: A dictionary with parsed query parameters.
+
+        Args:
+            environ (dict): The WSGI environment dictionary.
+
+        Returns:
+            dict: A dictionary with parsed query parameters.
         """
         query_string = environ.get('QUERY_STRING', '')
         return ParseQuery.parse_input_data(query_string)
@@ -88,6 +103,25 @@ class HeaderParser:
         return headers
     
 class Request:
+    """
+    Represents an HTTP request with parsed data from the WSGI environment.
+
+    Attributes:
+        method (str): HTTP method (GET, POST, etc.).
+        path (str): The request path.
+        headers (Dict[str, str]): HTTP headers.
+        query_params (Dict[str, Any]): Parsed query string parameters.
+        data (Dict[str, Any]): Parsed request body.
+        cookies (Dict[str, str]): Cookies from the request.
+        content_type (str): Content-Type header value.
+        content_length (int): Content-Length header value.
+        client_ip (str): Client's IP address.
+        server (str): Server name.
+        user_agent (str): User-Agent header value.
+        protocol (str): HTTP protocol version.
+        scheme (str): URL scheme (http/https).
+        is_secure (bool): Whether the connection is secure (HTTPS).
+    """
     method: str
     path: str
     headers: Dict[str, str]
@@ -102,8 +136,14 @@ class Request:
     protocol: str
     scheme: str
     is_secure: bool
-    
+
     def __init__(self, environ: dict):
+        """
+        Initializes a Request object from a WSGI environment.
+
+        Args:
+            environ (dict): The WSGI environment dictionary.
+        """
         self.environ = environ
 
         self.method: str = environ.get("REQUEST_METHOD", "GET").upper()
@@ -123,16 +163,34 @@ class Request:
         self.is_secure: bool = self.scheme == "https"
         
     def _get_path(self) -> str:
+        """
+        Extracts and normalizes the request path from the WSGI environment.
+
+        Returns:
+            str: The normalized request path with trailing slash.
+        """
         path = self.environ.get("PATH_INFO", "/")
         return unquote(path if path.endswith("/") else path + "/")
 
     def _parse_content_length(self) -> int:
+        """
+        Parses the Content-Length header from the WSGI environment.
+
+        Returns:
+            int: The content length, or 0 if not present or invalid.
+        """
         try:
             return int(self.environ.get("CONTENT_LENGTH", "0"))
         except (ValueError, TypeError):
             return 0
 
     def _parse_cookies(self) -> Dict[str, str]:
+        """
+        Parses cookies from the HTTP_COOKIE header.
+
+        Returns:
+            Dict[str, str]: A dictionary mapping cookie names to their values.
+        """
         cookie_str = self.environ.get("HTTP_COOKIE", "")
         cookies = {}
         for pair in cookie_str.split("; "):
