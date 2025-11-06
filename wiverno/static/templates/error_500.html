@@ -39,7 +39,7 @@
         padding: 1rem;
         border-radius: 8px;
         font-family: monospace;
-        font-size: 0.95rem; 
+        font-size: 0.95rem;
         color: #f9fafb;
         white-space: pre-wrap;
       }
@@ -56,10 +56,10 @@
       <h1>INTERNAL SERVER ERROR</h1>
       <p>
         Something went wrong on the server. We are already working on a
-        solution. 
+        solution.
       </p>
 
-      {% if debug %}
+      {% if traceback %}
       <div class="traceback">{{ traceback }}</div>
       {% endif %}
 
