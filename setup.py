@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 from pathlib import Path
 
-version = "0.1.0"
+version = "0.1.1"
 
 with open(Path(__file__).resolve().parent / 'wiverno' / '__init__.py') as f:
     for line in f:

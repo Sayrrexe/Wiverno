@@ -30,7 +30,7 @@ class Router:
             self._routes.append({
                 'path': path,
                 'handler': func,
-                'methods': methods or ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
+                'methods': methods
             })
             return func
         return decorator
