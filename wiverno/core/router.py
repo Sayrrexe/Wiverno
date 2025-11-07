@@ -13,7 +13,7 @@ class Router:
         """
         self._routes: list[dict] = []
 
-    def route(self, path: str, methods: list[str] | None = None):
+    def route(self, path: str, methods: list[str] | None = None) -> Callable:
         """
         Decorator to register a route with the router.
 
@@ -26,13 +26,13 @@ class Router:
             Callable: The decorator function.
         """
 
-        def decorator(func):
+        def decorator(func: Callable) -> Callable:
             self._routes.append({"path": path, "handler": func, "methods": methods})
             return func
 
         return decorator
 
-    def get(self, path: str):
+    def get(self, path: str) -> Callable:
         """
         Decorator to register a GET route.
 
@@ -44,7 +44,7 @@ class Router:
         """
         return self.route(path, methods=["GET"])
 
-    def post(self, path: str):
+    def post(self, path: str) -> Callable:
         """
         Decorator to register a POST route.
 
@@ -56,7 +56,7 @@ class Router:
         """
         return self.route(path, methods=["POST"])
 
-    def put(self, path: str):
+    def put(self, path: str) -> Callable:
         """
         Decorator to register a PUT route.
 
@@ -68,7 +68,7 @@ class Router:
         """
         return self.route(path, methods=["PUT"])
 
-    def patch(self, path: str):
+    def patch(self, path: str) -> Callable:
         """
         Decorator to register a PATCH route.
 
@@ -80,7 +80,7 @@ class Router:
         """
         return self.route(path, methods=["PATCH"])
 
-    def delete(self, path: str):
+    def delete(self, path: str) -> Callable:
         """
         Decorator to register a DELETE route.
 
@@ -92,7 +92,7 @@ class Router:
         """
         return self.route(path, methods=["DELETE"])
 
-    def connect(self, path: str):
+    def connect(self, path: str) -> Callable:
         """
         Decorator to register a CONNECT route.
 
@@ -104,7 +104,7 @@ class Router:
         """
         return self.route(path, methods=["CONNECT"])
 
-    def head(self, path: str):
+    def head(self, path: str) -> Callable:
         """
         Decorator to register a HEAD route.
 
@@ -116,7 +116,7 @@ class Router:
         """
         return self.route(path, methods=["HEAD"])
 
-    def options(self, path: str):
+    def options(self, path: str) -> Callable:
         """
         Decorator to register an OPTIONS route.
 
@@ -128,7 +128,7 @@ class Router:
         """
         return self.route(path, methods=["OPTIONS"])
 
-    def trace(self, path: str):
+    def trace(self, path: str) -> Callable:
         """
         Decorator to register a TRACE route.
 
@@ -140,7 +140,7 @@ class Router:
         """
         return self.route(path, methods=["TRACE"])
 
-    def add_route(self, path: str, handler: Callable, methods: list[str] | None = None):
+    def add_route(self, path: str, handler: Callable, methods: list[str] | None = None) -> None:
         """
         Programmatically adds a route to the router.
 
@@ -151,3 +151,12 @@ class Router:
                 If None, no method restriction is applied.
         """
         self._routes.append({"path": path, "handler": handler, "methods": methods})
+
+    def get_routes(self) -> list[dict]:
+        """
+        Returns the list of registered routes.
+
+        Returns:
+            list[dict]: List of route dictionaries containing path, handler, and methods.
+        """
+        return self._routes

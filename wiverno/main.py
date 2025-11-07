@@ -19,7 +19,7 @@ class PageNotFound404:
     Default 404 error handler that renders the error_404.html template.
     """
 
-    def __call__(self, _request):
+    def __call__(self, _request: Request) -> tuple[str, str]:
         """
         Handles 404 Not Found errors.
 
@@ -29,7 +29,7 @@ class PageNotFound404:
         Returns:
             tuple[str, str]: A tuple of (status, html_body).
         """
-        templator = Templator(folder=str(DEFAULT_TEMPLATE_PATH))
+        templator = Templator(folder=DEFAULT_TEMPLATE_PATH)
         return "404 NOT FOUND", templator.render("error_404.html")
 
 
@@ -38,7 +38,7 @@ class MethodNotAllowed405:
     Default 405 error handler that renders the error_405.html template.
     """
 
-    def __call__(self, request):
+    def __call__(self, request: Request) -> tuple[str, str]:
         """
         Handles 405 Method Not Allowed errors.
 
@@ -48,7 +48,7 @@ class MethodNotAllowed405:
         Returns:
             tuple[str, str]: A tuple of (status, html_body).
         """
-        templator = Templator(folder=str(DEFAULT_TEMPLATE_PATH))
+        templator = Templator(folder=DEFAULT_TEMPLATE_PATH)
         return "405 METHOD NOT ALLOWED", templator.render(
             "error_405.html", content={"method": request.method}
         )
@@ -59,7 +59,7 @@ class InternalServerError500:
     Default 500 error handler that renders the error_500.html template.
     """
 
-    def __call__(self, _request, error_traceback: str = None):
+    def __call__(self, _request: Request, error_traceback: str | None = None) -> tuple[str, str]:
         """
         Handles 500 Internal Server Error.
 
@@ -70,7 +70,7 @@ class InternalServerError500:
         Returns:
             tuple[str, str]: A tuple of (status, html_body).
         """
-        templator = Templator(folder=str(DEFAULT_TEMPLATE_PATH))
+        templator = Templator(folder=DEFAULT_TEMPLATE_PATH)
         return "500 INTERNAL SERVER ERROR", templator.render(
             "error_500.html", content={"traceback": error_traceback}
         )
@@ -89,7 +89,7 @@ class Wiverno:
         page_404: Callable[[Request], tuple[str, str]] = PageNotFound404(),
         page_405: Callable[[Request], tuple[str, str]] = MethodNotAllowed405(),
         page_500: Callable[[Request, str | None], tuple[str, str]] = InternalServerError500(),
-    ):
+    ) -> None:
         """
         Initializes the Wiverno application with a list of routes.
 
@@ -115,7 +115,7 @@ class Wiverno:
         self.page_405 = page_405
         self.page_500 = page_500
 
-    def route(self, path: str, methods: list[str] | None = None):
+    def route(self, path: str, methods: list[str] | None = None) -> Callable:
         """
         Decorator to register a route with the application.
 
@@ -128,7 +128,7 @@ class Wiverno:
             Callable: The decorator function.
         """
 
-        def decorator(func):
+        def decorator(func: Callable) -> Callable:
             normalized_path = "/" + path.strip("/")
             if normalized_path != "/":
                 normalized_path = normalized_path.rstrip("/")
@@ -138,7 +138,7 @@ class Wiverno:
 
         return decorator
 
-    def get(self, path: str):
+    def get(self, path: str) -> Callable:
         """
         Decorator to register a GET route.
 
@@ -150,7 +150,7 @@ class Wiverno:
         """
         return self.route(path, methods=["GET"])
 
-    def post(self, path: str):
+    def post(self, path: str) -> Callable:
         """
         Decorator to register a POST route.
 
@@ -162,7 +162,7 @@ class Wiverno:
         """
         return self.route(path, methods=["POST"])
 
-    def put(self, path: str):
+    def put(self, path: str) -> Callable:
         """
         Decorator to register a PUT route.
 
@@ -174,7 +174,7 @@ class Wiverno:
         """
         return self.route(path, methods=["PUT"])
 
-    def patch(self, path: str):
+    def patch(self, path: str) -> Callable:
         """
         Decorator to register a PATCH route.
 
@@ -186,7 +186,7 @@ class Wiverno:
         """
         return self.route(path, methods=["PATCH"])
 
-    def delete(self, path: str):
+    def delete(self, path: str) -> Callable:
         """
         Decorator to register a DELETE route.
 
@@ -198,7 +198,7 @@ class Wiverno:
         """
         return self.route(path, methods=["DELETE"])
 
-    def connect(self, path: str):
+    def connect(self, path: str) -> Callable:
         """
         Decorator to register a CONNECT route.
 
@@ -210,7 +210,7 @@ class Wiverno:
         """
         return self.route(path, methods=["CONNECT"])
 
-    def head(self, path: str):
+    def head(self, path: str) -> Callable:
         """
         Decorator to register a HEAD route.
 
@@ -222,7 +222,7 @@ class Wiverno:
         """
         return self.route(path, methods=["HEAD"])
 
-    def options(self, path: str):
+    def options(self, path: str) -> Callable:
         """
         Decorator to register an OPTIONS route.
 
@@ -234,7 +234,7 @@ class Wiverno:
         """
         return self.route(path, methods=["OPTIONS"])
 
-    def trace(self, path: str):
+    def trace(self, path: str) -> Callable:
         """
         Decorator to register a TRACE route.
 
@@ -246,7 +246,7 @@ class Wiverno:
         """
         return self.route(path, methods=["TRACE"])
 
-    def include_router(self, router: Router, prefix: str = ""):
+    def include_router(self, router: Router, prefix: str = "") -> None:
         """
         Includes routes from a Router instance into the application.
 
@@ -254,7 +254,7 @@ class Wiverno:
             router (Router): The Router instance containing routes to include.
             prefix (str, optional): URL prefix to prepend to all router paths. Defaults to ''.
         """
-        for route_info in router._routes:
+        for route_info in router.get_routes():
             full_path = prefix + route_info["path"]
 
             full_path = "/" + full_path.strip("/")
@@ -266,7 +266,7 @@ class Wiverno:
                 "methods": route_info["methods"],
             }
 
-    def _match_route(self, request: Request):
+    def _match_route(self, request: Request) -> tuple[Callable | None, bool | None]:
         """
         Matches the request path and method to a registered route.
 

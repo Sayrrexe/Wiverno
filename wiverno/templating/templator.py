@@ -1,4 +1,5 @@
-import os
+from pathlib import Path
+from typing import Any
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -11,20 +12,28 @@ class Templator:
     from a specified folder.
     """
 
-    def __init__(self, folder: str = "templates"):
+    def __init__(self, folder: str | Path = "templates") -> None:
         """
         Initializes the Templator with a template folder.
 
         Args:
-            folder (str, optional): Path to the templates folder relative to
-                the current working directory. Defaults to "templates".
+            folder (str | Path, optional): Path to the templates folder relative to
+                the current working directory, or an absolute path.
+                Can be a string or Path object. Defaults to "templates".
         """
 
         self.env = Environment(autoescape=True)
-        self.base_dir = os.getcwd()
-        self.env.loader = FileSystemLoader(os.path.join(self.base_dir, folder))
+        self.base_dir = Path.cwd()
 
-    def render(self, template_name: str, content: dict | None = None, **kwargs):
+        # Convert folder to Path if it's a string
+        folder_path = Path(folder) if isinstance(folder, str) else folder
+
+        # If it's an absolute path, use it directly; otherwise, make it relative to base_dir
+        template_dir = folder_path if folder_path.is_absolute() else self.base_dir / folder_path
+
+        self.env.loader = FileSystemLoader(str(template_dir))
+
+    def render(self, template_name: str, content: dict | None = None, **kwargs: Any) -> str:
         """
         Renders a template with the given context.
 

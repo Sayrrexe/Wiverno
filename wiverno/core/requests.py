@@ -69,10 +69,10 @@ class ParseBody:
                     data[name] = part.get_content()
             return data
 
-        elif content_type == "application/x-www-form-urlencoded":
+        if content_type == "application/x-www-form-urlencoded":
             return {k: v[0] for k, v in parse_qs(raw_data.decode()).items()}
 
-        elif content_type == "application/json":
+        if content_type == "application/json":
             try:
                 return json.loads(raw_data.decode())
             except json.JSONDecodeError:
@@ -141,7 +141,7 @@ class Request:
     scheme: str
     is_secure: bool
 
-    def __init__(self, environ: dict):
+    def __init__(self, environ: dict) -> None:
         """
         Initializes a Request object from a WSGI environment.
 

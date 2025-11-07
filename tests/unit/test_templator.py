@@ -42,10 +42,12 @@ class TestTemplatorInitialization:
 
     def test_templator_stores_base_dir(self):
         """Test: Templator should store base_dir."""
+        from pathlib import Path
+
         templator = Templator()
 
-        assert templator.base_dir == os.getcwd()
-        assert isinstance(templator.base_dir, str)
+        assert templator.base_dir == Path.cwd()
+        assert isinstance(templator.base_dir, Path)
 
 
 # ============================================================================

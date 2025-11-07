@@ -15,7 +15,7 @@ class RunServer:
         port (int): The port number to bind the server to.
     """
 
-    def __init__(self, application: Callable, host: str = "localhost", port: int = 8000):
+    def __init__(self, application: Callable, host: str = "localhost", port: int = 8000) -> None:
         """
         Initializes the server with application, host, and port.
 
