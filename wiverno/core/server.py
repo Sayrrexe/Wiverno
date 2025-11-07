@@ -36,7 +36,6 @@ class RunServer:
         """
         try:
             with make_server(self.host, self.port, self.application) as httpd:
-                logger.info(f"Serving on http://{self.host}:{self.port} ...")
                 httpd.serve_forever()
         except KeyboardInterrupt:
             logger.info("Server stopped by user.")

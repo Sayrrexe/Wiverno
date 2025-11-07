@@ -24,6 +24,9 @@ dependencies = [
     "jinja2>=3.1.6",
 ]
 
+[project.scripts]
+wiverno = "wiverno.cli:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
@@ -44,8 +47,8 @@ dev = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=8.0.0",
     "pytest-cov>=4.1.0",
     "pytest-benchmark>=4.0.0",
