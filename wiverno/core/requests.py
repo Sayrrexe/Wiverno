@@ -24,7 +24,7 @@ class ParseQuery:
         return {k: v[0] for k, v in parse_qs(data).items()}
 
     @staticmethod
-    def get_request_params(environ: dict) -> dict:
+    def get_request_params(environ: dict[str, Any]) -> dict[str, str]:
         """
         Retrieves and parses the query string from the WSGI environment.
 
@@ -45,7 +45,7 @@ class ParseBody:
     """
 
     @staticmethod
-    def get_request_params(environ: dict, raw_data: bytes) -> dict[str, Any]:
+    def get_request_params(environ: dict[str, Any], raw_data: bytes) -> dict[str, Any]:
         """
         Parses POST request data from the WSGI environment.
 
@@ -63,10 +63,11 @@ class ParseBody:
             msg = BytesParser(policy=default).parsebytes(content)
 
             data: dict[str, Any] = {}
-            for part in msg.iter_parts():
-                name: str | None = part.get_param("name", header="content-disposition")
-                if name:
-                    data[name] = part.get_content()
+            if hasattr(msg, "iter_parts"):
+                for part in msg.iter_parts():
+                    name: str | None = part.get_param("name", header="content-disposition")
+                    if name:
+                        data[name] = part.get_content()
             return data
 
         if content_type == "application/x-www-form-urlencoded":
@@ -74,7 +75,8 @@ class ParseBody:
 
         if content_type == "application/json":
             try:
-                return json.loads(raw_data.decode())
+                result: dict[str, Any] = json.loads(raw_data.decode())
+                return result
             except json.JSONDecodeError:
                 return {}
 
@@ -87,7 +89,7 @@ class HeaderParser:
     """
 
     @staticmethod
-    def get_headers(environ: dict) -> dict[str, str]:
+    def get_headers(environ: dict[str, Any]) -> dict[str, str]:
         """
         Parses headers from the WSGI environment.
 
@@ -141,7 +143,7 @@ class Request:
     scheme: str
     is_secure: bool
 
-    def __init__(self, environ: dict) -> None:
+    def __init__(self, environ: dict[str, Any]) -> None:
         """
         Initializes a Request object from a WSGI environment.
 

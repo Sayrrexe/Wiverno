@@ -15,7 +15,6 @@ from wiverno.core.requests import Request
 from wiverno.core.router import Router
 from wiverno.main import Wiverno
 
-
 # ============================================================================
 # WSGI Environment Fixtures
 # ============================================================================
@@ -56,16 +55,16 @@ def environ_factory(basic_environ):
         environ["QUERY_STRING"] = query_string
         environ["wsgi.input"] = io.BytesIO(body)
         environ["CONTENT_LENGTH"] = str(len(body))
-        
+
         if content_type:
             environ["CONTENT_TYPE"] = content_type
-        
+
         # Add custom headers in WSGI format
         if headers:
             for key, value in headers.items():
                 wsgi_key = f"HTTP_{key.upper().replace('-', '_')}"
                 environ[wsgi_key] = value
-        
+
         return environ
 
     return _make_environ
@@ -99,8 +98,8 @@ def router_with_routes(router: Router) -> Router:
         return "200 OK", "Create User"
 
     @router.get("/users/<id>")
-    def get_user(request, id):
-        return "200 OK", f"User {id}"
+    def get_user(request, user_id):
+        return "200 OK", f"User {user_id}"
 
     return router
 

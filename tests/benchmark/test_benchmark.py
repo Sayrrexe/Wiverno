@@ -10,16 +10,14 @@ Run:
     pytest tests/benchmark/test_benchmark.py --benchmark-autosave
 """
 
-import io
 import json
 
 import pytest
 
-from wiverno.core.requests import Request, ParseQuery, ParseBody, HeaderParser
+from wiverno.core.requests import HeaderParser, ParseBody, ParseQuery, Request
 from wiverno.core.router import Router
 from wiverno.main import Wiverno
 from wiverno.templating.templator import Templator
-
 
 # ============================================================================
 # Router Benchmarks
@@ -156,6 +154,7 @@ class TestTemplatorBenchmarks:
         result = benchmark(templator.render, "loop.html", items=items)
         assert "Item 0" in result
 
+
 # ============================================================================
 # Wiverno Application Benchmarks
 # ============================================================================
@@ -251,8 +250,7 @@ class TestComparativeBenchmarks:
         """Benchmark: JSON serialization."""
         data = {
             "users": [
-                {"id": i, "name": f"User{i}", "email": f"user{i}@example.com"}
-                for i in range(100)
+                {"id": i, "name": f"User{i}", "email": f"user{i}@example.com"} for i in range(100)
             ]
         }
 
@@ -289,15 +287,17 @@ class TestStressBenchmarks:
 
         def process_requests():
             results = []
-            for i in range(100):
+            response_status: list[str] = []
+            response_headers: list[list[tuple[str, str]]] = []
+
+            def start_response(status: str, headers: list[tuple[str, str]]) -> None:
+                response_status.append(status)
+                response_headers.append(headers)
+
+            for _i in range(100):
                 environ = environ_factory(method="GET", path="/")
-
-                response_status = []
-                response_headers = []
-
-                def start_response(status, headers):
-                    response_status.append(status)
-                    response_headers.append(headers)
+                response_status.clear()
+                response_headers.clear()
 
                 body_iter = app_with_routes(environ, start_response)
                 body = b"".join(body_iter)
@@ -319,8 +319,7 @@ class TestStressBenchmarks:
 
         templator = Templator(folder=str(temp_template_dir))
         users = [
-            {"id": i, "name": f"User{i}", "email": f"user{i}@example.com"}
-            for i in range(1000)
+            {"id": i, "name": f"User{i}", "email": f"user{i}@example.com"} for i in range(1000)
         ]
 
         result = benchmark(templator.render, "large.html", users=users)

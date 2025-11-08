@@ -2,6 +2,7 @@ import logging
 import traceback
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 from wiverno.core.requests import Request
 from wiverno.core.router import Router
@@ -101,7 +102,7 @@ class Wiverno:
             page_405: Callable to handle 405 errors (optional).
             page_500: Callable to handle 500 errors (optional).
         """
-        self._routes: dict[str, dict] = {}
+        self._routes: dict[str, dict[str, Any]] = {}
         if routes_list:
             for path, handler in routes_list:
                 self._routes[path] = {
@@ -115,7 +116,9 @@ class Wiverno:
         self.page_405 = page_405
         self.page_500 = page_500
 
-    def route(self, path: str, methods: list[str] | None = None) -> Callable:
+    def route(
+        self, path: str, methods: list[str] | None = None
+    ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         """
         Decorator to register a route with the application.
 
@@ -128,7 +131,7 @@ class Wiverno:
             Callable: The decorator function.
         """
 
-        def decorator(func: Callable) -> Callable:
+        def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
             normalized_path = "/" + path.strip("/")
             if normalized_path != "/":
                 normalized_path = normalized_path.rstrip("/")
@@ -138,7 +141,7 @@ class Wiverno:
 
         return decorator
 
-    def get(self, path: str) -> Callable:
+    def get(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         """
         Decorator to register a GET route.
 
@@ -150,7 +153,7 @@ class Wiverno:
         """
         return self.route(path, methods=["GET"])
 
-    def post(self, path: str) -> Callable:
+    def post(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         """
         Decorator to register a POST route.
 
@@ -162,7 +165,7 @@ class Wiverno:
         """
         return self.route(path, methods=["POST"])
 
-    def put(self, path: str) -> Callable:
+    def put(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         """
         Decorator to register a PUT route.
 
@@ -174,7 +177,7 @@ class Wiverno:
         """
         return self.route(path, methods=["PUT"])
 
-    def patch(self, path: str) -> Callable:
+    def patch(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         """
         Decorator to register a PATCH route.
 
@@ -186,7 +189,7 @@ class Wiverno:
         """
         return self.route(path, methods=["PATCH"])
 
-    def delete(self, path: str) -> Callable:
+    def delete(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         """
         Decorator to register a DELETE route.
 
@@ -198,7 +201,7 @@ class Wiverno:
         """
         return self.route(path, methods=["DELETE"])
 
-    def connect(self, path: str) -> Callable:
+    def connect(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         """
         Decorator to register a CONNECT route.
 
@@ -210,7 +213,7 @@ class Wiverno:
         """
         return self.route(path, methods=["CONNECT"])
 
-    def head(self, path: str) -> Callable:
+    def head(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         """
         Decorator to register a HEAD route.
 
@@ -222,7 +225,7 @@ class Wiverno:
         """
         return self.route(path, methods=["HEAD"])
 
-    def options(self, path: str) -> Callable:
+    def options(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         """
         Decorator to register an OPTIONS route.
 
@@ -234,7 +237,7 @@ class Wiverno:
         """
         return self.route(path, methods=["OPTIONS"])
 
-    def trace(self, path: str) -> Callable:
+    def trace(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         """
         Decorator to register a TRACE route.
 
@@ -266,7 +269,7 @@ class Wiverno:
                 "methods": route_info["methods"],
             }
 
-    def _match_route(self, request: Request) -> tuple[Callable | None, bool | None]:
+    def _match_route(self, request: Request) -> tuple[Callable[..., Any] | None, bool | None]:
         """
         Matches the request path and method to a registered route.
 
@@ -294,7 +297,7 @@ class Wiverno:
         return handler, method_allowed
 
     def __call__(
-        self, environ: dict, start_response: Callable[[str, list[tuple[str, str]]], None]
+        self, environ: dict[str, Any], start_response: Callable[[str, list[tuple[str, str]]], None]
     ) -> list[bytes]:
         """
         WSGI application entry point.

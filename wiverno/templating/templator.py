@@ -33,7 +33,9 @@ class Templator:
 
         self.env.loader = FileSystemLoader(str(template_dir))
 
-    def render(self, template_name: str, content: dict | None = None, **kwargs: Any) -> str:
+    def render(
+        self, template_name: str, content: dict[str, Any] | None = None, **kwargs: Any
+    ) -> str:
         """
         Renders a template with the given context.
 
@@ -52,4 +54,5 @@ class Templator:
         content = content or {}
         if not isinstance(content, dict):
             raise TypeError("Content must be a dictionary.")
-        return template.render(**content, **kwargs)
+        result: str = template.render(**content, **kwargs)
+        return result

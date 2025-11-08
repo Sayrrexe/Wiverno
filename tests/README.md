@@ -157,4 +157,3 @@ def test_example(environ_factory):
 #### Utilities
 
 - `call_wsgi_app` - utility for calling WSGI applications.
-

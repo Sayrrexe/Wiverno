@@ -12,7 +12,6 @@ import pytest
 
 from wiverno.core.router import Router
 
-
 # ============================================================================
 # Router Initialization Tests
 # ============================================================================
@@ -25,7 +24,7 @@ class TestRouterInitialization:
     def test_router_initialization(self):
         """Test: Router should initialize with empty route list."""
         router = Router()
-        
+
         assert router._routes == []
         assert isinstance(router._routes, list)
 
@@ -74,7 +73,7 @@ class TestRouteDecorator:
             return "200 OK", "Original"
 
         decorated = router.route("/test")(original_function)
-        
+
         # Check that the same function was returned
         assert decorated is original_function
 
@@ -95,7 +94,7 @@ class TestRouteDecorator:
 
         # Check number of routes
         assert len(router._routes) == 3
-        
+
         # Check paths
         paths = [route["path"] for route in router._routes]
         assert "/first" in paths
@@ -244,7 +243,7 @@ class TestAddRoute:
 
         # Check count
         assert len(router._routes) == 2
-        
+
         # Check content
         assert router._routes[0]["path"] == "/first"
         assert router._routes[1]["path"] == "/second"

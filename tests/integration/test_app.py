@@ -4,13 +4,11 @@ Integration tests for Wiverno application.
 Tests complete request processing cycle through WSGI interface.
 """
 
-import io
 import json
 
 import pytest
 
 from wiverno.main import Wiverno
-
 
 # ============================================================================
 # Main Application Integration Tests

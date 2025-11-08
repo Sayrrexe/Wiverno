@@ -8,13 +8,11 @@ Tests:
 - Request: creating request object from WSGI environ
 """
 
-import io
 import json
 
 import pytest
 
-from wiverno.core.requests import ParseQuery, ParseBody, HeaderParser, Request
-
+from wiverno.core.requests import HeaderParser, ParseBody, ParseQuery, Request
 
 # ============================================================================
 # ParseQuery Tests
@@ -104,16 +102,16 @@ class TestParseBody:
         """Test: Parsing multipart/form-data."""
         boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"
         raw_data = (
-            f"------WebKitFormBoundary7MA4YWxkTrZu0gW\r\n"
-            f'Content-Disposition: form-data; name="field1"\r\n'
-            f"\r\n"
-            f"value1\r\n"
-            f"------WebKitFormBoundary7MA4YWxkTrZu0gW\r\n"
-            f'Content-Disposition: form-data; name="field2"\r\n'
-            f"\r\n"
-            f"value2\r\n"
-            f"------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
-        ).encode("utf-8")
+            b"------WebKitFormBoundary7MA4YWxkTrZu0gW\r\n"
+            b'Content-Disposition: form-data; name="field1"\r\n'
+            b"\r\n"
+            b"value1\r\n"
+            b"------WebKitFormBoundary7MA4YWxkTrZu0gW\r\n"
+            b'Content-Disposition: form-data; name="field2"\r\n'
+            b"\r\n"
+            b"value2\r\n"
+            b"------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n"
+        )
 
         basic_environ["CONTENT_TYPE"] = f"multipart/form-data; boundary={boundary}"
         basic_environ["CONTENT_LENGTH"] = str(len(raw_data))
@@ -254,9 +252,7 @@ class TestRequestInitialization:
         json_data = {"key": "value"}
         body = json.dumps(json_data).encode("utf-8")
 
-        environ = environ_factory(
-            method="POST", body=body, content_type="application/json"
-        )
+        environ = environ_factory(method="POST", body=body, content_type="application/json")
         request = Request(environ)
 
         assert request.data == json_data

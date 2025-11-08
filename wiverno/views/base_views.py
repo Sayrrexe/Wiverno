@@ -31,7 +31,8 @@ class BaseView:
         """
         handler = getattr(self, request.method.lower(), None)
         if handler:
-            return handler(request)
+            result: tuple[str, str] = handler(request)
+            return result
 
         handler_405 = MethodNotAllowed405()
         return handler_405(request)

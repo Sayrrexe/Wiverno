@@ -4,11 +4,11 @@ Unit tests for RunServer class.
 Tests server initialization, configuration, and WSGI integration.
 """
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 
 from wiverno.core.server import RunServer
-
 
 # ============================================================================
 # RunServer Initialization Tests
@@ -233,7 +233,7 @@ class TestRunServerEdgeCases:
 
     def test_server_with_callable_application(self):
         """Test: Application should be a callable object."""
-        
+
         class CallableApp:
             def __call__(self, environ, start_response):
                 status = "200 OK"
@@ -253,4 +253,3 @@ class TestRunServerEdgeCases:
         server = RunServer(app, host="")
 
         assert server.host == ""
-

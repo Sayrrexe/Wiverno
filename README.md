@@ -10,6 +10,26 @@ Clone the repository and install the package using `pip`:
 pip install .
 ```
 
+## Development Setup
+
+For contributors and developers:
+
+1. **Install with development dependencies**:
+
+   ```bash
+   pip install -e ".[dev]"
+   # or using uv:
+   uv sync --all-extras
+   ```
+
+2. **Install pre-commit hooks**:
+
+   ```bash
+   uv run pre-commit install
+   ```
+
+   This will automatically run code quality checks before each commit. See [Pre-commit Hooks Guide](docs/dev/pre-commit.md) for details.
+
 ## Minimal example
 
 ```python

@@ -6,26 +6,31 @@ Python source files are modified, making it easier to develop and test
 Wiverno applications.
 """
 
+import subprocess
 import sys
 import time
-import subprocess
 from pathlib import Path
-from threading import Thread, Event
+from threading import Event, Thread
 from typing import Any
 
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
-from watchdog.events import FileSystemEvent, FileSystemEventHandler
+from watchdog.events import FileSystemEvent
 from watchdog.observers import Observer
+
+try:
+    from watchdog.events import FileSystemEventHandler
+except ImportError:
+    FileSystemEventHandler = object
 
 console = Console()
 
 
-class DebounceHandler(FileSystemEventHandler):
+class DebounceHandler(FileSystemEventHandler):  # type: ignore[misc]
     """
     File system event handler with debouncing to prevent excessive restarts.
-    
+
     Attributes:
         restart_callback: Function to call when files change.
         debounce_seconds: Minimum time between restarts in seconds.
@@ -40,7 +45,7 @@ class DebounceHandler(FileSystemEventHandler):
     ) -> None:
         """
         Initialize the debounce handler.
-        
+
         Args:
             restart_callback: Function to call on file changes.
             debounce_seconds: Time to wait before triggering restart.
@@ -57,16 +62,16 @@ class DebounceHandler(FileSystemEventHandler):
     def _should_ignore(self, path: str) -> bool:
         """
         Check if a path should be ignored based on patterns.
-        
+
         Args:
             path: File path to check.
-            
+
         Returns:
             True if path should be ignored, False otherwise.
         """
         path_obj = Path(path)
         path_str = str(path_obj)
-        
+
         for pattern in self.ignore_patterns:
             if pattern in path_str:
                 return True
@@ -87,7 +92,7 @@ class DebounceHandler(FileSystemEventHandler):
     def on_modified(self, event: FileSystemEvent) -> None:
         """
         Handle file modification events.
-        
+
         Args:
             event: File system event.
         """
@@ -105,7 +110,7 @@ class DebounceHandler(FileSystemEventHandler):
         console.print(f"[yellow]WARNING: File changed:[/yellow] {event.src_path}")
 
         self._pending_event.set()
-        
+
         # Start debounce thread if not already running
         if self._debounce_thread is None or not self._debounce_thread.is_alive():
             self._debounce_thread = Thread(target=self._debounce_restart, daemon=True)
@@ -115,7 +120,7 @@ class DebounceHandler(FileSystemEventHandler):
 class DevServer:
     """
     Development server with hot reload capabilities.
-    
+
     This server monitors Python files for changes and automatically restarts
     the application when modifications are detected.
     """
@@ -132,7 +137,7 @@ class DevServer:
     ) -> None:
         """
         Initialize the development server.
-        
+
         Args:
             app_module: Module path containing the WSGI application (e.g., 'run').
             app_name: Name of the application variable in the module (default: 'app').
@@ -161,24 +166,25 @@ class DevServer:
         ]
         self.debounce_seconds = debounce_seconds
         self.process: subprocess.Popen[bytes] | None = None
-        self.observer: Observer | None = None 
+        self.observer: Observer | None = None
         self._restart_count = 0
 
     def _get_debug_mode(self) -> str:
         """
         Get debug mode status from the application.
-        
+
         Returns:
             String representation of debug mode status.
         """
         try:
             import importlib
+
             module = importlib.import_module(self.app_module)
             app = getattr(module, self.app_name)
-            if hasattr(app, 'debug'):
+            if hasattr(app, "debug"):
                 return "[green]ON[/green]" if app.debug else "[red]OFF[/red]"
             return "[dim]Unknown[/dim]"
-        except Exception:
+        except Exception:  # noqa: BLE001
             return "[dim]Unknown[/dim]"
 
     def _start_server_process(self) -> None:
@@ -187,22 +193,24 @@ class DevServer:
             self._stop_server_process()
 
         self._restart_count += 1
-        
+
         # Get debug mode from app
         debug_status = self._get_debug_mode()
-        
+
         # Print server info immediately
-        console.print(Panel(
-            Text.from_markup(
-                f"[bold cyan]Wiverno[/bold cyan] [bold green]Development Server[/bold green]\n\n"
-                f"[cyan]Server:[/cyan] http://{self.host}:{self.port}\n"
-                f"[cyan]Debug Mode:[/cyan] {debug_status}\n"
-                f"[cyan]Restart:[/cyan] #{self._restart_count}\n"
-                f"[dim]Press Ctrl+C to stop[/dim]"
-            ),
-            border_style="green",
-            expand=False,
-        ))
+        console.print(
+            Panel(
+                Text.from_markup(
+                    f"[bold cyan]Wiverno[/bold cyan] [bold green]Development Server[/bold green]\n\n"
+                    f"[cyan]Server:[/cyan] http://{self.host}:{self.port}\n"
+                    f"[cyan]Debug Mode:[/cyan] {debug_status}\n"
+                    f"[cyan]Restart:[/cyan] #{self._restart_count}\n"
+                    f"[dim]Press Ctrl+C to stop[/dim]"
+                ),
+                border_style="green",
+                expand=False,
+            )
+        )
 
         # Create command to run the server
         # We'll use a Python command that imports and runs the app
@@ -216,15 +224,15 @@ from {self.app_module} import {self.app_name}
 server = RunServer({self.app_name}, host="{self.host}", port={self.port})
 server.start()
 """
-        
+
         # Start subprocess without capturing output - let it print directly
-        self.process = subprocess.Popen(
+        self.process = subprocess.Popen(  # noqa: S603
             [sys.executable, "-u", "-c", python_code],
         )
 
     def _stop_server_process(self, show_restart_message: bool = True) -> None:
         """Stop the WSGI server process.
-        
+
         Args:
             show_restart_message: If True, show the restarting message.
         """
@@ -247,18 +255,18 @@ server.start()
     def start(self) -> None:
         """
         Start the development server with hot reload.
-        
+
         This method starts the server and sets up file watching for automatic
         restarts when Python files are modified.
-        
-        Hot Reload работает следующим образом:
-        1. Watchdog отслеживает изменения в .py файлах в указанных директориях
-        2. При изменении файла срабатывает событие FileSystemEvent
-        3. Debounce механизм ждет 1 секунду, чтобы собрать все изменения
-        4. После задержки запускается перезапуск сервера
-        5. Старый процесс сервера корректно завершается (terminate)
-        6. Запускается новый процесс с обновленным кодом
-        7. Счетчик перезапусков увеличивается для отслеживания
+
+        Hot Reload works as follows:
+        1. Watchdog tracks changes in .py files in specified directories
+        2. When a file is modified, a FileSystemEvent is triggered
+        3. Debounce mechanism waits 1 second to collect all changes
+        4. After delay, server restart is initiated
+        5. Old server process is properly terminated
+        6. New process is started with updated code
+        7. Restart counter is incremented for tracking
         """
         console.print(
             "[bold cyan]Wiverno[/bold cyan] [bold]Hot Reload[/bold] [green]enabled[/green]"
@@ -277,7 +285,7 @@ server.start()
         self.observer = Observer()
         for watch_dir in self.watch_dirs:
             self.observer.schedule(event_handler, watch_dir, recursive=True)
-        
+
         self.observer.start()
 
         try:
@@ -293,7 +301,7 @@ server.start()
         if self.observer:
             self.observer.stop()
             self.observer.join()
-        
+
         self._stop_server_process(show_restart_message=False)
         console.print("[green]>> Server stopped successfully[/green]")
 
@@ -306,7 +314,7 @@ def run_dev_server(
 ) -> None:
     """
     Convenience function to run the development server.
-    
+
     Args:
         app_module: Module path containing the WSGI application.
         app_name: Name of the application variable in the module.

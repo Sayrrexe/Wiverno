@@ -8,14 +8,12 @@ Tests:
 - Jinja2 integration
 """
 
-import os
 from pathlib import Path
 
 import pytest
 from jinja2 import Environment, TemplateNotFound
 
 from wiverno.templating.templator import Templator
-
 
 # ============================================================================
 # Templator Initialization Tests
@@ -42,7 +40,6 @@ class TestTemplatorInitialization:
 
     def test_templator_stores_base_dir(self):
         """Test: Templator should store base_dir."""
-        from pathlib import Path
 
         templator = Templator()
 
@@ -117,9 +114,7 @@ class TestTemplatorRendering:
         templator = Templator(folder=str(sample_template))
 
         # Should not error with content=None
-        result = templator.render(
-            "test.html", content=None, title="Test", heading="H1"
-        )
+        result = templator.render("test.html", content=None, title="Test", heading="H1")
 
         assert "Test" in result
 
@@ -204,15 +199,11 @@ class TestTemplatorVariousTemplates:
         templator = Templator(folder=str(temp_template_dir))
 
         # With condition True
-        result_true = templator.render(
-            "conditional.html", show_message=True, message="Hello"
-        )
+        result_true = templator.render("conditional.html", show_message=True, message="Hello")
         assert "Hello" in result_true
 
         # With condition False
-        result_false = templator.render(
-            "conditional.html", show_message=False, message="Hello"
-        )
+        result_false = templator.render("conditional.html", show_message=False, message="Hello")
         assert "Hello" not in result_false
 
     def test_render_template_with_filters(self, temp_template_dir):
