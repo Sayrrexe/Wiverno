@@ -167,6 +167,8 @@ omit = [
     "*/__pycache__/*",
     "*/venv/*",
     "*/.venv/*",
+    "wiverno/cli.py",
+    "wiverno/dev/dev_server.py"
 ]
 branch = true  # Enable branch coverage
 
