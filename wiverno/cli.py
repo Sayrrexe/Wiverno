@@ -47,25 +47,114 @@ def start() -> None:
 
 
 @app.command("docs")
-def docs() -> None:
+def docs(
+    host: str = typer.Option(
+        "127.0.0.1",
+        "--host",
+        "-h",
+        help="Documentation server host",
+    ),
+    port: int = typer.Option(
+        8000,
+        "--port",
+        "-p",
+        help="Documentation server port",
+    ),
+    open_browser: bool = typer.Option(
+        True,
+        "--open/--no-open",
+        help="Open browser automatically when serving",
+    ),
+) -> None:
     """
-    Open or generate project documentation (placeholder command).
+    Serve project documentation using MkDocs with live reload.
     
-    This command will be enhanced in future versions to provide
-    documentation generation and viewing capabilities.
+    This command starts a local documentation server that automatically
+    reloads when you make changes to your documentation files.
+    
+    Examples:
+        wiverno docs                    # Serve docs at http://127.0.0.1:8000
+        wiverno docs --port 3000        # Serve on custom port
+        wiverno docs --no-open          # Don't open browser automatically
     """
+    import subprocess
+    import sys
+    import webbrowser
+    from time import sleep
+    
+    # Check if mkdocs.yml exists
+    mkdocs_config = Path.cwd() / "mkdocs.yml"
+    if not mkdocs_config.exists():
+        console.print(
+            "[bold red]ERROR:[/bold red] mkdocs.yml not found in current directory.\n\n"
+            "[yellow]This command requires MkDocs to be configured.[/yellow]\n"
+            f"[dim]Current directory: {Path.cwd()}[/dim]\n\n"
+            "[cyan]To set up documentation:[/cyan]\n"
+            "1. Create mkdocs.yml in your project root\n"
+            "2. Install mkdocs-material: [green]uv pip install mkdocs-material[/green]\n"
+            "3. Run: [green]wiverno docs --serve[/green]"
+        )
+        raise typer.Exit(1)
+    
+    try:
+        # Check if mkdocs is installed
+        result = subprocess.run(
+            [sys.executable, "-m", "mkdocs", "--version"],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            raise FileNotFoundError
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        console.print(
+            "[bold red]ERROR:[/bold red] MkDocs is not installed.\n\n"
+            "[yellow]Install MkDocs to use this command:[/yellow]\n"
+            "[green]$ uv pip install mkdocs-material mkdocstrings[python][/green]\n\n"
+            "Or install all dev dependencies:\n"
+            "[green]$ uv pip install -e .[dev][/green]"
+        )
+        raise typer.Exit(1)
+    
+    # Serve documentation
+    url = f"http://{host}:{port}"
     console.print(Panel(
         Text.from_markup(
-            "[bold yellow]Documentation (Coming Soon)[/bold yellow]\n\n"
-            "This command is currently a placeholder.\n\n"
-            "Future features:\n"
-            "  - Generate API documentation\n"
-            "  - Open docs in browser\n"
-            "  - Documentation server"
+            "[bold cyan]Wiverno[/bold cyan] [bold green]Documentation Server[/bold green]\n\n"
+            f"[cyan]Server:[/cyan] {url}\n"
+            f"[cyan]Config:[/cyan] mkdocs.yml\n"
+            f"[dim]Press Ctrl+C to stop[/dim]\n\n"
+            "[yellow]Watching for changes...[/yellow]"
         ),
-        border_style="yellow",
+        border_style="green",
         expand=False,
     ))
+    
+    # Open browser if requested
+    if open_browser:
+        # Give server a moment to start
+        def open_in_browser():
+            sleep(1.5)
+            try:
+                webbrowser.open(url)
+                console.print(f"[dim]>> Opened {url} in browser[/dim]")
+            except Exception:
+                pass
+        
+        import threading
+        browser_thread = threading.Thread(target=open_in_browser, daemon=True)
+        browser_thread.start()
+    
+    try:
+        # Run mkdocs serve
+        subprocess.run(
+            [sys.executable, "-m", "mkdocs", "serve", "-a", f"{host}:{port}"],
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        console.print(f"[bold red]ERROR:[/bold red] Server failed: {e}")
+        raise typer.Exit(1)
+    except KeyboardInterrupt:
+        console.print("\n[green]>> Documentation server stopped[/green]")
 
 
 @app.command("help")
@@ -101,7 +190,7 @@ def show_help() -> None:
     )
     table.add_row(
         "wiverno docs",
-        "Open/generate documentation (placeholder)",
+        "Serve documentation with live reload",
     )
     table.add_row(
         "wiverno help",
@@ -118,6 +207,8 @@ def show_help() -> None:
         ("Start dev server on all interfaces", "wiverno run dev --host 0.0.0.0"),
         ("Start production server", "wiverno run prod --host 0.0.0.0 --port 8080"),
         ("Custom app location", "wiverno run dev --app-module myapp --app-name application"),
+        ("Serve documentation", "wiverno docs"),
+        ("Serve docs on custom port", "wiverno docs --port 8001"),
     ]
     
     for desc, cmd in examples:

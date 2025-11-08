@@ -1,4 +1,5 @@
 # Wiverno
+
 **Wiverno** — a lightweight WSGI framework for building fast and flexible Python web applications.
 
 ## Installation
@@ -13,21 +14,20 @@ pip install .
 
 ```python
 from wiverno.main import Wiverno
-from wiverno.core.server import RunServer
 
+app = Wiverno()
+
+@app.get("/")
 def index(request):
     return "200 OK", "Hello, World!"
-
-app = Wiverno(routes_list=[("/", index)])
-RunServer(app).start()
 ```
 
 ## Running
 
-Save the example above to `app.py` and start the server:
+Save the example above to `run.py` and start the development server:
 
 ```bash
-python app.py
+wiverno run dev
 ```
 
 The application will be available at `http://localhost:8000/`.

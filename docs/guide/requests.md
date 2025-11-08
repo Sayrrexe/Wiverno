@@ -1,0 +1,416 @@
+# Requests
+
+Understanding request handling in Wiverno.
+
+## Overview
+
+The `Request` class provides access to all incoming HTTP request data including headers, query parameters, POST data, cookies, and more.
+
+## Request Object
+
+Every view function receives a `Request` object:
+
+```python
+from wiverno.core.requests import Request
+
+def my_view(request: Request) -> tuple[str, str]:
+    """View function with request parameter."""
+    # Access request data here
+    return "200 OK", "Response"
+```
+
+## Request Attributes
+
+### HTTP Method
+
+```python
+def handle_request(request):
+    """Check the HTTP method."""
+    method = request.method  # "GET", "POST", "PUT", etc.
+
+    if request.method == "GET":
+        return "200 OK", "GET request"
+    elif request.method == "POST":
+        return "201 CREATED", "POST request"
+```
+
+### Path Information
+
+```python
+def show_path(request):
+    """Display request path."""
+    path = request.path  # e.g., "/users/123"
+    return "200 OK", f"Path: {path}"
+```
+
+### Query Parameters
+
+Parse query strings from GET requests:
+
+```python
+def search(request):
+    """Handle search with query parameters."""
+    # URL: /search?q=python&page=2&limit=10
+
+    query = request.query_params.get("q", "")         # "python"
+    page = request.query_params.get("page", "1")      # "2"
+    limit = request.query_params.get("limit", "10")   # "10"
+
+    return "200 OK", f"Search: {query}, Page: {page}"
+
+```
+
+### POST Data
+
+Access form data and JSON from POST requests:
+
+```python
+def handle_form(request):
+    """Handle form submission."""
+    if request.method == "POST":
+        # Access POST data
+        username = request.data.get("username", "")
+        email = request.data.get("email", "")
+        return "200 OK", f"User: {username}, Email: {email}"
+    """
+```
+
+### JSON Data
+
+Handle JSON POST requests:
+
+```python
+def api_create(request):
+    """Handle JSON API request."""
+    if request.method == "POST":
+        # POST data is automatically parsed from JSON
+        # Content-Type: application/json
+        data = request.data
+
+        name = data.get("name")
+        age = data.get("age")
+
+        return "201 CREATED", f'{{"name": "{name}", "age": {age}}}'
+```
+
+### Headers
+
+Access HTTP headers:
+
+```python
+def show_headers(request):
+    """Display request headers."""
+    headers = request.headers
+
+    user_agent = headers.get("User-Agent", "Unknown")
+    content_type = headers.get("Content-Type", "")
+    accept = headers.get("Accept", "")
+
+    return "200 OK", f"User-Agent: {user_agent}"
+
+# Check for specific headers
+def check_auth(request):
+    """Check authorization header."""
+    auth = request.headers.get("Authorization", "")
+    if not auth:
+        return "401 UNAUTHORIZED", "Missing auth"
+    return "200 OK", "Authorized"
+```
+
+### Cookies
+
+Access request cookies:
+
+```python
+def show_cookies(request):
+    """Display cookies."""
+    cookies = request.cookies
+
+    session_id = cookies.get("session_id", "")
+    user_pref = cookies.get("preference", "default")
+
+    return "200 OK", f"Session: {session_id}"
+```
+
+### Raw WSGI Environ
+
+Access the raw WSGI environment:
+
+```python
+def debug_info(request):
+    """Show raw WSGI environ."""
+    environ = request.environ
+
+    # Access any WSGI variable
+    server_name = environ.get("SERVER_NAME")
+    server_port = environ.get("SERVER_PORT")
+    scheme = environ.get("wsgi.url_scheme")
+
+    return "200 OK", f"Server: {server_name}:{server_port}"
+```
+
+## Request Body
+
+### Reading Raw Body
+
+Access raw request body:
+
+```python
+def handle_raw_body(request):
+    """Read raw request body."""
+    # Get content length
+    content_length = int(request.environ.get("CONTENT_LENGTH", 0))
+
+    if content_length > 0:
+        # Read raw body
+        wsgi_input = request.environ.get("wsgi.input")
+        raw_body = wsgi_input.read(content_length)
+
+        # Process raw bytes
+        # raw_body is bytes
+
+        return "200 OK", "Body processed"
+
+    return "400 BAD REQUEST", "No body"
+```
+
+### Multipart Form Data
+
+Handle file uploads:
+
+```python
+def upload_file(request):
+    """Handle file upload."""
+    if request.method == "POST":
+        # Multipart form data is parsed automatically
+        # Content-Type: multipart/form-data
+
+        file_content = request.data.get("file")
+        filename = request.data.get("filename", "upload.txt")
+
+        # Save file or process content
+        # file_content is the file data
+
+        return "200 OK", f"Uploaded: {filename}"
+
+    return "200 OK", """
+        <form method="post" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <button type="submit">Upload</button>
+        </form>
+    """
+```
+
+## Content Types
+
+Wiverno automatically handles different content types:
+
+### application/x-www-form-urlencoded
+
+Standard HTML form submission:
+
+```python
+def handle_form(request):
+    """Handle URL-encoded form."""
+    # Content-Type: application/x-www-form-urlencoded
+    username = request.data.get("username")
+    password = request.data.get("password")
+    return "200 OK", "Form received"
+```
+
+### application/json
+
+JSON API requests:
+
+```python
+def api_endpoint(request):
+    """Handle JSON request."""
+    # Content-Type: application/json
+    data = request.data
+    # data is already a dict
+    return "200 OK", "JSON received"
+```
+
+### multipart/form-data
+
+File uploads and mixed data:
+
+```python
+def upload(request):
+    """Handle multipart form."""
+    # Content-Type: multipart/form-data; boundary=...
+    file_data = request.data.get("file")
+    description = request.data.get("description")
+    return "200 OK", "Upload received"
+```
+
+## Request Parsing Utilities
+
+Wiverno provides utility classes for parsing:
+
+### ParseQuery
+
+```python
+from wiverno.core.requests import ParseQuery
+
+# Parse query string
+query_string = "name=John&age=30"
+params = ParseQuery.parse_input_data(query_string)
+# {"name": "John", "age": "30"}
+
+# Get from environ
+params = ParseQuery.get_request_params(environ)
+```
+
+### ParseBody
+
+```python
+from wiverno.core.requests import ParseBody
+
+# Parse POST body
+raw_data = b'{"name": "John"}'
+params = ParseBody.get_request_params(environ, raw_data)
+```
+
+### HeaderParser
+
+```python
+from wiverno.core.requests import HeaderParser
+
+# Parse headers
+headers = HeaderParser.get_headers(environ)
+```
+
+## Common Patterns
+
+### Check Request Method
+
+```python
+def resource(request):
+    """Handle different HTTP methods."""
+    if request.method == "GET":
+        return "200 OK", "Get resource"
+    elif request.method == "POST":
+        return "201 CREATED", "Created resource"
+    elif request.method == "PUT":
+        return "200 OK", "Updated resource"
+    elif request.method == "DELETE":
+        return "204 NO CONTENT", ""
+    else:
+        return "405 METHOD NOT ALLOWED", ""
+```
+
+### Validate Input
+
+```python
+def create_user(request):
+    """Create user with validation."""
+    if request.method != "POST":
+        return "405 METHOD NOT ALLOWED", ""
+
+    # Get data
+    username = request.data.get("username", "").strip()
+    email = request.data.get("email", "").strip()
+
+    # Validate
+    if not username:
+        return "400 BAD REQUEST", "Username required"
+    if not email:
+        return "400 BAD REQUEST", "Email required"
+    if "@" not in email:
+        return "400 BAD REQUEST", "Invalid email"
+
+    # Process
+    return "201 CREATED", f"User {username} created"
+```
+
+### Parse Pagination
+
+```python
+def list_items(request):
+    """List items with pagination."""
+    # Get page and limit from query
+    page = int(request.query_params.get("page", "1"))
+    limit = int(request.query_params.get("limit", "10"))
+
+    # Validate
+    if page < 1:
+        page = 1
+    if limit < 1 or limit > 100:
+        limit = 10
+
+    # Calculate offset
+    offset = (page - 1) * limit
+
+    return "200 OK", f"Page {page}, Limit {limit}, Offset {offset}"
+```
+
+### Handle API Authentication
+
+```python
+def protected_endpoint(request):
+    """Require API key."""
+    api_key = request.headers.get("X-API-Key", "")
+
+    if not api_key:
+        return "401 UNAUTHORIZED", '{"error": "API key required"}'
+
+    if api_key != "secret-key":
+        return "403 FORBIDDEN", '{"error": "Invalid API key"}'
+
+    # Authorized
+    return "200 OK", '{"data": "protected data"}'
+```
+
+## Best Practices
+
+### 1. Always Validate Input
+
+```python
+def safe_handler(request):
+    """Validate all input."""
+    value = request.query_params.get("value", "")
+
+    # Validate
+    if not value:
+        return "400 BAD REQUEST", "Value required"
+
+    # Sanitize
+    value = value.strip()[:100]  # Limit length
+
+    return "200 OK", f"Value: {value}"
+```
+
+### 2. Use Type Conversion Safely
+
+```python
+def get_page(request):
+    """Safe type conversion."""
+    try:
+        page = int(request.query_params.get("page", "1"))
+    except ValueError:
+        page = 1
+
+    # Ensure valid range
+    page = max(1, min(page, 1000))
+
+    return "200 OK", f"Page {page}"
+```
+
+### 3. Handle Missing Data
+
+```python
+def safe_access(request):
+    """Use .get() with defaults."""
+    # Good
+    name = request.query_params.get("name", "Guest")
+
+    # Bad - may raise KeyError
+    # name = request.query_params["name"]
+```
+
+## Next Steps
+
+- [Routing](routing.md) - Define routes and handlers
+- [Class-Based Views](../api/views/base-views.md) - Organize with class-based views
+- [Templates](../api/templating/templator.md) - Render HTML templates

@@ -249,7 +249,7 @@ class TestRequestInitialization:
 
         assert request.query_params == {"page": "2", "limit": "20"}
 
-    def test_request_post_data_json(self, environ_factory):
+    def test_request_data_json(self, environ_factory):
         """Test: Parsing JSON data from POST."""
         json_data = {"key": "value"}
         body = json.dumps(json_data).encode("utf-8")
