@@ -15,59 +15,8 @@ import json
 import pytest
 
 from wiverno.core.requests import HeaderParser, ParseBody, ParseQuery, Request
-from wiverno.core.router import Router
 from wiverno.main import Wiverno
 from wiverno.templating.templator import Templator
-
-# ============================================================================
-# Router Benchmarks
-# ============================================================================
-
-
-@pytest.mark.benchmark
-class TestRouterBenchmarks:
-    """Router performance benchmarks."""
-
-    def test_benchmark_route_registration(self, benchmark):
-        """Benchmark: Route registration via decorator."""
-
-        def register_route():
-            router = Router()
-
-            @router.get("/test")
-            def handler(request):
-                return "200 OK", "Test"
-
-            return router
-
-        result = benchmark(register_route)
-        assert len(result._routes) == 1
-
-    def test_benchmark_multiple_route_registration(self, benchmark):
-        """Benchmark: Registering multiple routes."""
-
-        def register_multiple_routes():
-            router = Router()
-            for i in range(100):
-                router.add_route(f"/route{i}", lambda req: ("200 OK", "OK"))
-            return router
-
-        result = benchmark(register_multiple_routes)
-        assert len(result._routes) == 100
-
-    def test_benchmark_route_lookup(self, benchmark, router_with_routes):
-        """Benchmark: Route lookup in list."""
-
-        def lookup_route():
-            # Simulate route lookup
-            for route in router_with_routes._routes:
-                if route["path"] == "/users":
-                    return route
-            return None
-
-        result = benchmark(lookup_route)
-        assert result is not None
-
 
 # ============================================================================
 # Request Benchmarks
@@ -185,7 +134,7 @@ class TestWivernoBenchmarks:
         assert "200" in status
 
     def test_benchmark_route_matching(self, benchmark):
-        """Benchmark: Route matching."""
+        """Benchmark: Route matching performance with many routes."""
         app = Wiverno()
 
         # Create many routes using the route decorator
@@ -195,14 +144,12 @@ class TestWivernoBenchmarks:
             def handler(req, route_num=i):
                 return ("200 OK", f"Route {route_num}")
 
-        # Find route in the middle
-        def find_route():
-            for route_path, route_data in app._routes.items():
-                if route_path == "/route50":
-                    return route_data
-            return None
+        # Match route in the middle (static route - O(1) lookup)
+        def match_route():
+            handler, params, allowed = app._registry.match("/route50", "GET")
+            return handler
 
-        result = benchmark(find_route)
+        result = benchmark(match_route)
         assert result is not None
 
     def test_benchmark_app_initialization(self, benchmark):
@@ -222,7 +169,10 @@ class TestWivernoBenchmarks:
             return app
 
         app = benchmark(init_app)
-        assert len(app._routes) == 2
+        # Check both static routes are registered
+        assert len(app._registry._static_routes) == 2
+        assert "/" in app._registry._static_routes
+        assert "/users" in app._registry._static_routes
 
 
 # ============================================================================

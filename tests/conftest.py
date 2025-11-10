@@ -12,7 +12,7 @@ from typing import Any
 import pytest
 
 from wiverno.core.requests import Request
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 from wiverno.main import Wiverno
 
 # ============================================================================
@@ -79,29 +79,6 @@ def environ_factory(basic_environ):
 def router() -> Router:
     """Clean Router instance for tests."""
     return Router()
-
-
-@pytest.fixture
-def router_with_routes(router: Router) -> Router:
-    """Router with predefined test routes."""
-
-    @router.get("/")
-    def home(request):
-        return "200 OK", "Home"
-
-    @router.get("/users")
-    def users_list(request):
-        return "200 OK", "Users List"
-
-    @router.post("/users")
-    def create_user(request):
-        return "200 OK", "Create User"
-
-    @router.get("/users/<id>")
-    def get_user(request, user_id):
-        return "200 OK", f"User {user_id}"
-
-    return router
 
 
 # ============================================================================

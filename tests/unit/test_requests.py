@@ -233,12 +233,12 @@ class TestRequestInitialization:
         assert request.method == "POST"
 
     def test_request_path_parsing(self, environ_factory):
-        """Test: Request path parsing."""
+        """Test: Request path parsing and normalization."""
         environ = environ_factory(path="/api/users")
         request = Request(environ)
 
-        # Request adds trailing slash
-        assert request.path == "/api/users/"
+        # Request normalizes path (removes trailing slash except for root)
+        assert request.path == "/api/users"
 
     def test_request_query_params(self, environ_factory):
         """Test: Query parameter parsing."""
@@ -365,18 +365,20 @@ class TestRequestPathNormalization:
     """Tests for path normalization."""
 
     def test_path_adds_trailing_slash(self, environ_factory):
-        """Test: Adding trailing slash to path."""
+        """Test: Path normalization removes trailing slash."""
         environ = environ_factory(path="/users")
         request = Request(environ)
 
-        assert request.path == "/users/"
+        # Path normalization removes trailing slash (except for root)
+        assert request.path == "/users"
 
     def test_path_keeps_trailing_slash(self, environ_factory):
-        """Test: Keeping existing trailing slash."""
+        """Test: Path normalization removes existing trailing slash."""
         environ = environ_factory(path="/users/")
         request = Request(environ)
 
-        assert request.path == "/users/"
+        # Trailing slash is removed during normalization
+        assert request.path == "/users"
 
     def test_path_url_decoding(self, environ_factory):
         """Test: URL decoding of path."""
@@ -402,7 +404,7 @@ class TestRequestIntegration:
         request = Request(environ)
 
         assert request.method == "GET"
-        assert request.path == "/api/users/"
+        assert request.path == "/api/users"  # Normalized (no trailing slash)
         assert request.query_params == {"page": "1", "sort": "name"}
         assert request.headers["User-Agent"] == "TestClient/1.0"
 

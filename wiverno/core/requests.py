@@ -173,10 +173,20 @@ class Request:
         Extracts and normalizes the request path from the WSGI environment.
 
         Returns:
-            str: The normalized request path with trailing slash.
+            str: The normalized request path without trailing slash (except for root "/").
         """
         path = self.environ.get("PATH_INFO", "/")
-        return unquote(path if path.endswith("/") else path + "/")
+        path = unquote(path)
+
+        if not path:
+            return "/"
+
+        path = "/" + path.strip("/")
+
+        if path != "/":
+            path = path.rstrip("/")
+
+        return path
 
     def _parse_content_length(self) -> int:
         """
