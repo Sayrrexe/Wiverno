@@ -1,4 +1,6 @@
+from wiverno.core.requests import Request
 from wiverno.main import MethodNotAllowed405
+
 
 class BaseView:
     """
@@ -17,7 +19,7 @@ class BaseView:
                 return '201 CREATED', '<html>POST response</html>'
     """
 
-    def __call__(self, request):
+    def __call__(self, request: Request) -> tuple[str, str]:
         """
         Dispatches the request to the appropriate HTTP method handler.
 
@@ -29,7 +31,8 @@ class BaseView:
         """
         handler = getattr(self, request.method.lower(), None)
         if handler:
-            return handler(request)
+            result: tuple[str, str] = handler(request)
+            return result
 
         handler_405 = MethodNotAllowed405()
         return handler_405(request)

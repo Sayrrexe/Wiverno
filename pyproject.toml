@@ -1,9 +1,245 @@
 [project]
-name = "wiverno-1"
-version = "0.1.1"
-description = "Add your description here"
+name = "wiverno"
+version = "0.1.3"
+description = "A lightweight WSGI framework for building fast and flexible Python web applications"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.12"
+authors = [
+    { name = "Sayrrexe" }
+]
+keywords = ["web", "framework", "wsgi"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+
 dependencies = [
     "jinja2>=3.1.6",
 ]
+
+[project.scripts]
+wiverno = "wiverno.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "pytest-benchmark>=4.0.0",
+    "ruff>=0.6.0",
+    "mypy>=1.11.0",
+    "pre-commit>=3.8.0",
+    "watchdog>=4.0.0",
+    "rich>=13.7.0",
+    "python-dotenv>=1.0.0",
+    "typer>=0.12.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.25.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "pytest-benchmark>=4.0.0",
+    "ruff>=0.6.0",
+    "mypy>=1.11.0",
+    "pre-commit>=3.8.0",
+    "watchdog>=4.0.0",
+    "rich>=13.7.0",
+    "python-dotenv>=1.0.0",
+    "typer>=0.12.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.25.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+# Enable automatic fixing
+fix = true
+# Show fixes that were applied
+show-fixes = true
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+    "ARG",  # flake8-unused-arguments
+    "SIM",  # flake8-simplify
+    "RUF",  # Ruff-specific rules
+    "ANN",  # flake8-annotations
+    "ASYNC",# flake8-async
+    "S",    # flake8-bandit (security)
+    "BLE",  # flake8-blind-except
+    "A",    # flake8-builtins
+    "COM",  # flake8-commas
+    "DTZ",  # flake8-datetimez
+    "ISC",  # flake8-implicit-str-concat
+    "ICN",  # flake8-import-conventions
+    "PIE",  # flake8-pie
+    "PT",   # flake8-pytest-style
+    "Q",    # flake8-quotes
+    "RSE",  # flake8-raise
+    "RET",  # flake8-return
+    "SLF",  # flake8-self
+    "SLOT", # flake8-slots
+    "TID",  # flake8-tidy-imports
+    "TCH",  # flake8-type-checking
+    "PTH",  # flake8-use-pathlib
+    "PL",   # pylint
+    "PERF", # Perflint
+]
+ignore = [
+    "E501",    # line too long (handled by formatter)
+    "B008",    # do not perform function calls in argument defaults
+    "ANN401",  # dynamically typed expressions (Any) are disallowed
+    "S101",    # use of assert detected
+    "PLR0913", # too many arguments to function call
+    "PLR2004", # magic value used in comparison
+    "COM812",  # trailing comma missing (conflicts with formatter)
+    "ISC001",  # single line implicit string concatenation (conflicts with formatter)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # unused imports in __init__.py
+"tests/**/*.py" = [
+    "S101",    # assert allowed in tests
+    "ANN",     # no type annotations required in tests
+    "PLR2004", # magic values allowed in tests
+    "ARG",     # unused arguments allowed in tests/fixtures
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.lint.isort]
+known-first-party = ["wiverno"]
+combine-as-imports = true
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = [
+    "-ra",                          # Show summary for all test outcomes
+    "--strict-markers",             # Strict marker validation
+    "--strict-config",              # Strict config validation
+    "--showlocals",                 # Show local variables on failure
+    "-v",                           # Verbose output
+    "--tb=short",                   # Short traceback format
+    "--cov=wiverno",               # Measure coverage for wiverno package
+    "--cov-report=term-missing",    # Show missing lines in terminal
+    "--cov-report=html",            # HTML report
+    "--cov-report=xml",             # XML report for CI/CD
+    "--cov-fail-under=50",          # Minimum coverage 50%
+]
+markers = [
+    "unit: marks tests as unit tests (fast, isolated)",
+    "integration: marks tests as integration tests (slower, multiple components)",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "benchmark: marks tests as performance benchmarks",
+]
+
+[tool.coverage.run]
+source = ["wiverno"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+    "wiverno/cli.py",
+    "wiverno/dev/dev_server.py"
+]
+branch = true  # Enable branch coverage
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.mypy]
+# Strict mode - enables all strict type checks
+strict = true
+python_version = "3.12"
+
+# Main settings
+warn_return_any = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+
+# Strict type checking
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = false
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+
+# None settings
+no_implicit_optional = true
+strict_optional = true
+
+# Imports
+follow_imports = "normal"
+ignore_missing_imports = false
+
+# Error output
+show_error_codes = true
+show_column_numbers = true
+show_error_context = true
+pretty = true
+
+# Cache for speed
+cache_dir = ".mypy_cache"
+incremental = true
+
+# Ignore strict mode for tests
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_untyped_calls = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+
+# Ignore external libraries without types
+[[tool.mypy.overrides]]
+module = [
+    "wsgiref.*",
+]
+ignore_missing_imports = true

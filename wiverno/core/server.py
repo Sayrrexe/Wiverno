@@ -1,8 +1,10 @@
-from wsgiref.simple_server import make_server
-from typing import Callable
 import logging
+from collections.abc import Callable
+from typing import Any
+from wsgiref.simple_server import make_server
 
 logger = logging.getLogger(__name__)
+
 
 class RunServer:
     """
@@ -13,8 +15,10 @@ class RunServer:
         host (str): The hostname to bind the server to.
         port (int): The port number to bind the server to.
     """
-    
-    def __init__(self, application: Callable, host: str = 'localhost', port: int = 8000):
+
+    def __init__(
+        self, application: Callable[..., Any], host: str = "localhost", port: int = 8000
+    ) -> None:
         """
         Initializes the server with application, host, and port.
 
@@ -25,8 +29,8 @@ class RunServer:
         """
         self.host: str = host
         self.port: int = port
-        self.application: Callable = application
-        
+        self.application: Callable[..., Any] = application
+
     def start(self) -> None:
         """
         Starts the WSGI server and serves the application forever.
