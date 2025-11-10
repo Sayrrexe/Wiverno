@@ -5,10 +5,15 @@ from pathlib import Path
 from typing import Any
 
 from wiverno.core.requests import Request
-from wiverno.core.router import Router
+from wiverno.core.routing.base import RouterMixin
+from wiverno.core.routing.registry import RouterRegistry
+from wiverno.core.routing.router import Router
 from wiverno.templating.templator import Templator
 
 logger = logging.getLogger(__name__)
+
+type Handler = Callable[[Request], tuple[str, str]]
+type ErrorHandler = Callable[[Request, str | None], tuple[str, str]]
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -77,14 +82,13 @@ class InternalServerError500:
         )
 
 
-class Wiverno:
+class Wiverno(RouterMixin):
     """
     A simple WSGI-compatible web framework.
     """
 
     def __init__(
         self,
-        routes_list: list[tuple[str, Callable[[Request], tuple[str, str]]]] | None = None,
         debug_mode: bool = True,
         system_template_path: str = str(DEFAULT_TEMPLATE_PATH),
         page_404: Callable[[Request], tuple[str, str]] = PageNotFound404(),
@@ -95,214 +99,41 @@ class Wiverno:
         Initializes the Wiverno application with a list of routes.
 
         Args:
-            routes_list: List of tuples (path, view-function), (optional).
             debug_mode: Enable or disable debug mode (default is True).
             system_template_path: Path to base templates used for error pages.
             page_404: Callable to handle 404 errors (optional).
             page_405: Callable to handle 405 errors (optional).
             page_500: Callable to handle 500 errors (optional).
         """
-        self._routes: dict[str, dict[str, Any]] = {}
-        if routes_list:
-            for path, handler in routes_list:
-                self._routes[path] = {
-                    "handler": handler,
-                    "methods": None,  # 'methods': None means all HTTP methods are allowed for this route,
-                    # consistent with the behavior in route matching logic.
-                }
+        self.__registry = RouterRegistry()
+
         self.system_templator = Templator(folder=system_template_path)
         self.debug = debug_mode
         self.page_404 = page_404
         self.page_405 = page_405
         self.page_500 = page_500
 
-    def route(
-        self, path: str, methods: list[str] | None = None
-    ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+    @property
+    def _registry(self) -> RouterRegistry:
         """
-        Decorator to register a route with the application.
-
-        Args:
-            path (str): The URL path for the route.
-            methods (Optional[List[str]]): Allowed HTTP methods for this route.
-                If None, all methods are allowed.
+        Get the RouterRegistry instance for this application.
 
         Returns:
-            Callable: The decorator function.
+            RouterRegistry: The registry that stores and matches routes.
         """
-
-        def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
-            normalized_path = "/" + path.strip("/")
-            if normalized_path != "/":
-                normalized_path = normalized_path.rstrip("/")
-
-            self._routes[normalized_path] = {"handler": func, "methods": methods}
-            return func
-
-        return decorator
-
-    def get(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-        """
-        Decorator to register a GET route.
-
-        Args:
-            path (str): The URL path for the route.
-
-        Returns:
-            Callable: The decorator function.
-        """
-        return self.route(path, methods=["GET"])
-
-    def post(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-        """
-        Decorator to register a POST route.
-
-        Args:
-            path (str): The URL path for the route.
-
-        Returns:
-            Callable: The decorator function.
-        """
-        return self.route(path, methods=["POST"])
-
-    def put(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-        """
-        Decorator to register a PUT route.
-
-        Args:
-            path (str): The URL path for the route.
-
-        Returns:
-            Callable: The decorator function.
-        """
-        return self.route(path, methods=["PUT"])
-
-    def patch(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-        """
-        Decorator to register a PATCH route.
-
-        Args:
-            path (str): The URL path for the route.
-
-        Returns:
-            Callable: The decorator function.
-        """
-        return self.route(path, methods=["PATCH"])
-
-    def delete(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-        """
-        Decorator to register a DELETE route.
-
-        Args:
-            path (str): The URL path for the route.
-
-        Returns:
-            Callable: The decorator function.
-        """
-        return self.route(path, methods=["DELETE"])
-
-    def connect(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-        """
-        Decorator to register a CONNECT route.
-
-        Args:
-            path (str): The URL path for the route.
-
-        Returns:
-            Callable: The decorator function.
-        """
-        return self.route(path, methods=["CONNECT"])
-
-    def head(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-        """
-        Decorator to register a HEAD route.
-
-        Args:
-            path (str): The URL path for the route.
-
-        Returns:
-            Callable: The decorator function.
-        """
-        return self.route(path, methods=["HEAD"])
-
-    def options(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-        """
-        Decorator to register an OPTIONS route.
-
-        Args:
-            path (str): The URL path for the route.
-
-        Returns:
-            Callable: The decorator function.
-        """
-        return self.route(path, methods=["OPTIONS"])
-
-    def trace(self, path: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-        """
-        Decorator to register a TRACE route.
-
-        Args:
-            path (str): The URL path for the route.
-
-        Returns:
-            Callable: The decorator function.
-        """
-        return self.route(path, methods=["TRACE"])
+        return self.__registry
 
     def include_router(self, router: Router, prefix: str = "") -> None:
         """
-        Includes routes from a Router instance into the application.
+        Include routes from a Router instance into this application.
 
         Args:
-            router (Router): The Router instance containing routes to include.
-            prefix (str, optional): URL prefix to prepend to all router paths. Defaults to ''.
+            router: The Router instance whose routes should be included.
+            prefix: Optional path prefix to prepend to all routes from the router.
+                   For example, prefix="/api" will make router routes accessible
+                   under /api/... paths.
         """
-        if prefix:
-            prefix = prefix.rstrip("/")
-            if not prefix.startswith("/"):
-                prefix = "/" + prefix
-
-        for route_info in router._routes:
-            path = route_info["path"]
-            
-            normalized_path = path if path.startswith("/") else "/" + path
-            
-            full_path = prefix + normalized_path if prefix else normalized_path
-            
-            if full_path != "/":
-                full_path = full_path.rstrip("/")
-            
-            self._routes[full_path] = {
-                "handler": route_info["handler"],
-                "methods": route_info.get("methods"),  
-            }
-
-    def _match_route(self, request: Request) -> tuple[Callable[..., Any] | None, bool | None]:
-        """
-        Matches the request path and method to a registered route.
-
-        Args:
-            request (Request): The incoming request object.
-
-        Returns:
-            tuple[Callable | None, bool | None]: A tuple of (handler, method_allowed).
-                - handler: The route handler function if found, None otherwise.
-                - method_allowed: True if the method is allowed, False if not, None if route not found.
-        """
-        route_info = self._routes.get(request.path)
-
-        if not route_info:
-            return None, None
-
-        handler = route_info["handler"]
-        allowed_methods = route_info["methods"]
-
-        if allowed_methods is None:
-            return handler, True
-
-        method_allowed = request.method in allowed_methods
-
-        return handler, method_allowed
+        self.__registry.merge_from(router.registry, prefix)
 
     def __call__(
         self, environ: dict[str, Any], start_response: Callable[[str, list[tuple[str, str]]], None]
@@ -321,19 +152,21 @@ class Wiverno:
 
         request = Request(environ)
 
-        normalized_path = request.path.rstrip("/") if request.path != "/" else request.path
-        request.path = normalized_path
-
         try:
-            handler, method_allowed = self._match_route(request)
+            handler, path_params, method_allowed = self.__registry.match(
+                request.path,
+                request.method,
+            )
 
-            if handler is None:
+            if path_params:
+                request.path_params = path_params
+
+            if handler is None and method_allowed is None:
                 status, body = self.page_404(request)
-
-            elif not method_allowed:
+            elif handler is None and method_allowed is False:
                 status, body = self.page_405(request)
             else:
-                status, body = handler(request)
+                status, body = handler(request)  # type: ignore
 
         except Exception:
             logger.exception("Unhandled exception in view handler")

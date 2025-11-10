@@ -25,10 +25,8 @@ class Templator:
         self.env = Environment(autoescape=True)
         self.base_dir = Path.cwd()
 
-        # Convert folder to Path if it's a string
         folder_path = Path(folder) if isinstance(folder, str) else folder
 
-        # If it's an absolute path, use it directly; otherwise, make it relative to base_dir
         template_dir = folder_path if folder_path.is_absolute() else self.base_dir / folder_path
 
         self.env.loader = FileSystemLoader(str(template_dir))

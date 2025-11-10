@@ -70,6 +70,8 @@ target-version = "py312"
 fix = true
 # Show fixes that were applied
 show-fixes = true
+# Exclude tests from linting
+extend-exclude = ["tests"]
 
 [tool.ruff.lint]
 select = [
@@ -118,6 +120,8 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]  # unused imports in __init__.py
+"wiverno/cli.py" = ["PLC0415"]  # lazy imports are intentional in CLI
+"wiverno/dev/dev_server.py" = ["PLC0415"]  # lazy imports for optional dependencies
 "tests/**/*.py" = [
     "S101",    # assert allowed in tests
     "ANN",     # no type annotations required in tests

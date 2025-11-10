@@ -16,18 +16,13 @@ from typing import Any
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
-from watchdog.events import FileSystemEvent
+from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
-
-try:
-    from watchdog.events import FileSystemEventHandler
-except ImportError:
-    FileSystemEventHandler = object
 
 console = Console()
 
 
-class DebounceHandler(FileSystemEventHandler):  # type: ignore[misc]
+class DebounceHandler(FileSystemEventHandler):
     """
     File system event handler with debouncing to prevent excessive restarts.
 
@@ -99,11 +94,9 @@ class DebounceHandler(FileSystemEventHandler):  # type: ignore[misc]
         if event.is_directory:
             return
 
-        # Only watch Python files
         if not event.src_path.endswith(".py"):
             return
 
-        # Check ignore patterns
         if self._should_ignore(event.src_path):
             return
 
@@ -111,7 +104,6 @@ class DebounceHandler(FileSystemEventHandler):  # type: ignore[misc]
 
         self._pending_event.set()
 
-        # Start debounce thread if not already running
         if self._debounce_thread is None or not self._debounce_thread.is_alive():
             self._debounce_thread = Thread(target=self._debounce_restart, daemon=True)
             self._debounce_thread.start()
@@ -184,7 +176,7 @@ class DevServer:
             if hasattr(app, "debug"):
                 return "[green]ON[/green]" if app.debug else "[red]OFF[/red]"
             return "[dim]Unknown[/dim]"
-        except Exception:  # noqa: BLE001
+        except (ImportError, AttributeError):
             return "[dim]Unknown[/dim]"
 
     def _start_server_process(self) -> None:
@@ -194,10 +186,8 @@ class DevServer:
 
         self._restart_count += 1
 
-        # Get debug mode from app
         debug_status = self._get_debug_mode()
 
-        # Print server info immediately
         console.print(
             Panel(
                 Text.from_markup(
@@ -212,8 +202,6 @@ class DevServer:
             )
         )
 
-        # Create command to run the server
-        # We'll use a Python command that imports and runs the app
         python_code = f"""
 import logging
 logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -225,7 +213,6 @@ server = RunServer({self.app_name}, host="{self.host}", port={self.port})
 server.start()
 """
 
-        # Start subprocess without capturing output - let it print directly
         self.process = subprocess.Popen(  # noqa: S603
             [sys.executable, "-u", "-c", python_code],
         )
@@ -272,10 +259,8 @@ server.start()
             "[bold cyan]Wiverno[/bold cyan] [bold]Hot Reload[/bold] [green]enabled[/green]"
         )
 
-        # Start the server
         self._start_server_process()
 
-        # Set up file watching
         event_handler = DebounceHandler(
             restart_callback=self._restart_server,
             debounce_seconds=self.debounce_seconds,
@@ -289,7 +274,6 @@ server.start()
         self.observer.start()
 
         try:
-            # Keep the main thread alive
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:

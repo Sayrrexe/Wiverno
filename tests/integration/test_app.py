@@ -69,10 +69,12 @@ class TestWivernoIntegration:
         def posts(request):
             return "200 OK", "Posts"
 
-        # Check that routes are registered
-        # Note: POST /users overwrites GET /users as they share the same path
-        # So we have: /, /users (POST only), /posts = 3 routes
-        assert len(app._routes) == 3
+        # Check that routes are registered correctly
+        # Static routes: /, /users, /posts = 3 paths
+        # Note: /users has both GET and POST methods
+        assert len(app._registry._static_routes) == 3
+        assert "GET" in app._registry._static_routes["/users"]
+        assert "POST" in app._registry._static_routes["/users"]
 
 
 @pytest.mark.integration
