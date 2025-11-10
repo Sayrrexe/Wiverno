@@ -262,12 +262,20 @@ class Wiverno:
             if not prefix.startswith("/"):
                 prefix = "/" + prefix
 
-        for path, route_data in router._routes.items():
+        for route_info in router._routes:
+            path = route_info["path"]
+            
             normalized_path = path if path.startswith("/") else "/" + path
-
+            
             full_path = prefix + normalized_path if prefix else normalized_path
-
-            self._routes[full_path] = route_data
+            
+            if full_path != "/":
+                full_path = full_path.rstrip("/")
+            
+            self._routes[full_path] = {
+                "handler": route_info["handler"],
+                "methods": route_info.get("methods"),  
+            }
 
     def _match_route(self, request: Request) -> tuple[Callable[..., Any] | None, bool | None]:
         """
