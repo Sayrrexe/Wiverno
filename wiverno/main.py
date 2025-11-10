@@ -257,17 +257,17 @@ class Wiverno:
             router (Router): The Router instance containing routes to include.
             prefix (str, optional): URL prefix to prepend to all router paths. Defaults to ''.
         """
-        for route_info in router.get_routes():
-            full_path = prefix + route_info["path"]
+        if prefix:
+            prefix = prefix.rstrip("/")
+            if not prefix.startswith("/"):
+                prefix = "/" + prefix
 
-            full_path = "/" + full_path.strip("/")
-            if full_path != "/":
-                full_path = full_path.rstrip("/")
+        for path, route_data in router._routes.items():
+            normalized_path = path if path.startswith("/") else "/" + path
 
-            self._routes[full_path] = {
-                "handler": route_info["handler"],
-                "methods": route_info["methods"],
-            }
+            full_path = prefix + normalized_path if prefix else normalized_path
+
+            self._routes[full_path] = route_data
 
     def _match_route(self, request: Request) -> tuple[Callable[..., Any] | None, bool | None]:
         """
