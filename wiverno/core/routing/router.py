@@ -11,7 +11,6 @@ class Router(RouterMixin):
     RouterRegistry for route storage and matching.
     """
 
-
     def __init__(self) -> None:
         """
         Initialize a new Router with an empty route registry.
@@ -19,9 +18,19 @@ class Router(RouterMixin):
         self.__registry = RouterRegistry()
 
     @property
-    def _registry(self) -> RouterRegistry:
+    def registry(self) -> RouterRegistry:
         """
         Get the RouterRegistry instance for this router.
+
+        Returns:
+            RouterRegistry: The registry that stores and matches routes.
+        """
+        return self.__registry
+
+    @property
+    def _registry(self) -> RouterRegistry:
+        """
+        Get the RouterRegistry instance for this router (internal use).
 
         Returns:
             RouterRegistry: The registry that stores and matches routes.

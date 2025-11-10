@@ -88,7 +88,7 @@ def compile_path(path: str) -> PathPattern:
     """
     # ReDoS protection: limit number of parameters
     param_count = path.count("{")
-    if param_count > 20:  
+    if param_count > 20:
         raise ValueError(f"Too many parameters in path: {param_count} (max 20)")
 
     param_names = []

@@ -4,8 +4,8 @@ from collections.abc import Callable
 from wiverno.core.requests import Request
 from wiverno.core.routing.registry import RouterRegistry
 
-
 type Handler = Callable[[Request], tuple[str, str]]
+
 
 class RouterMixin(ABC):
     """
@@ -45,9 +45,11 @@ class RouterMixin(ABC):
         Returns:
             A decorator function that registers the handler and returns it unchanged.
         """
+
         def decorator(func: Handler) -> Handler:
             self._registry.register(path, func, methods)
             return func
+
         return decorator
 
     def get(self, path: str) -> Callable[[Handler], Handler]:

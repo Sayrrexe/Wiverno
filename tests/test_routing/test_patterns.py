@@ -100,7 +100,7 @@ class TestPathCompilation:
     def test_too_many_parameters_protection(self):
         """Test: ReDoS protection - limit number of parameters."""
         path = "/" + "/".join([f"{{param{i}}}" for i in range(21)])
-        
+
         with pytest.raises(ValueError, match="Too many parameters"):
             compile_path(path)
 
@@ -296,9 +296,11 @@ class TestPatternEdgeCases:
 
     def test_pattern_immutability(self):
         """Test: PathPattern is immutable (frozen dataclass)."""
+        from dataclasses import FrozenInstanceError
+
         pattern = compile_path("/users/{id}")
 
-        with pytest.raises(Exception):  # FrozenInstanceError
+        with pytest.raises(FrozenInstanceError):
             pattern.pattern_str = "/changed"  # type: ignore
 
     def test_zero_float_conversion(self):

@@ -31,7 +31,7 @@ class TestRouterMixinDecorators:
             return "200 OK", "Users"
 
         matched_handler, params, allowed = router._registry.match("/users", "GET")
-        
+
         assert matched_handler == handler
         assert allowed is True
 
@@ -65,9 +65,9 @@ class TestRouterMixinDecorators:
             return "200 OK", "GET Users"
 
         matched_handler, params, allowed = router._registry.match("/users", "GET")
-        
+
         assert matched_handler == handler
-        
+
         # Should not match POST
         matched_handler, params, allowed = router._registry.match("/users", "POST")
         assert matched_handler is None
@@ -82,7 +82,7 @@ class TestRouterMixinDecorators:
             return "201 Created", "User created"
 
         matched_handler, params, allowed = router._registry.match("/users", "POST")
-        
+
         assert matched_handler == handler
 
     def test_put_decorator(self):
@@ -94,7 +94,7 @@ class TestRouterMixinDecorators:
             return "200 OK", "User updated"
 
         matched_handler, params, allowed = router._registry.match("/users/1", "PUT")
-        
+
         assert matched_handler == handler
 
     def test_patch_decorator(self):
@@ -106,7 +106,7 @@ class TestRouterMixinDecorators:
             return "200 OK", "User patched"
 
         matched_handler, params, allowed = router._registry.match("/users/1", "PATCH")
-        
+
         assert matched_handler == handler
 
     def test_delete_decorator(self):
@@ -118,7 +118,7 @@ class TestRouterMixinDecorators:
             return "204 No Content", ""
 
         matched_handler, params, allowed = router._registry.match("/users/1", "DELETE")
-        
+
         assert matched_handler == handler
 
     def test_head_decorator(self):
@@ -130,7 +130,7 @@ class TestRouterMixinDecorators:
             return "200 OK", ""
 
         matched_handler, params, allowed = router._registry.match("/status", "HEAD")
-        
+
         assert matched_handler == handler
 
     def test_options_decorator(self):
@@ -142,7 +142,7 @@ class TestRouterMixinDecorators:
             return "200 OK", "OPTIONS"
 
         matched_handler, params, allowed = router._registry.match("/api", "OPTIONS")
-        
+
         assert matched_handler == handler
 
     def test_connect_decorator(self):
@@ -154,7 +154,7 @@ class TestRouterMixinDecorators:
             return "200 OK", "Connected"
 
         matched_handler, params, allowed = router._registry.match("/tunnel", "CONNECT")
-        
+
         assert matched_handler == handler
 
     def test_trace_decorator(self):
@@ -166,7 +166,7 @@ class TestRouterMixinDecorators:
             return "200 OK", "TRACE"
 
         matched_handler, params, allowed = router._registry.match("/debug", "TRACE")
-        
+
         assert matched_handler == handler
 
 
@@ -300,7 +300,7 @@ class TestDynamicRoutes:
             return "200 OK", "User"
 
         matched_handler, params, allowed = router._registry.match("/users/42", "GET")
-        
+
         assert matched_handler == handler
         assert params == {"id": 42}
         assert isinstance(params["id"], int)
@@ -314,7 +314,7 @@ class TestDynamicRoutes:
             return "200 OK", "Post"
 
         matched_handler, params, allowed = router._registry.match("/users/5/posts/10", "GET")
-        
+
         assert matched_handler == handler
         assert params == {"user_id": 5, "post_id": 10}
 
@@ -327,6 +327,6 @@ class TestDynamicRoutes:
             return "200 OK", "Tag"
 
         matched_handler, params, allowed = router._registry.match("/tags/python", "GET")
-        
+
         assert matched_handler == handler
         assert params == {"name": "python"}

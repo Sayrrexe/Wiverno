@@ -394,7 +394,7 @@ class TestPathNormalizationProduction:
         environ = environ_factory(path="/api/users/")
         status, headers, body = call_wsgi_app(app, environ)
         assert status == "200 OK"
-        
+
         # Test that path without trailing slash also works
         environ = environ_factory(path="/api/users")
         status, headers, body = call_wsgi_app(app, environ)

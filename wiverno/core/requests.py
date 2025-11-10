@@ -126,6 +126,7 @@ class Request:
         protocol (str): HTTP protocol version.
         scheme (str): URL scheme (http/https).
         is_secure (bool): Whether the connection is secure (HTTPS).
+        path_params (Dict[str, Any]): URL path parameters extracted from dynamic routes.
     """
 
     method: str
@@ -142,6 +143,7 @@ class Request:
     protocol: str
     scheme: str
     is_secure: bool
+    path_params: dict[str, Any]
 
     def __init__(self, environ: dict[str, Any]) -> None:
         """
@@ -167,6 +169,7 @@ class Request:
         self.protocol: str = environ.get("SERVER_PROTOCOL", "")
         self.scheme: str = environ.get("wsgi.url_scheme", "http")
         self.is_secure: bool = self.scheme == "https"
+        self.path_params: dict[str, Any] = {}
 
     def _get_path(self) -> str:
         """
@@ -175,7 +178,7 @@ class Request:
         Returns:
             str: The normalized request path without trailing slash (except for root "/").
         """
-        path = self.environ.get("PATH_INFO", "/")
+        path: str = self.environ.get("PATH_INFO", "/")
         path = unquote(path)
 
         if not path:

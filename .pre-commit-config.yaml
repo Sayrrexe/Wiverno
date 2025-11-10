@@ -6,20 +6,13 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.8.4
     hooks:
-      # Run the linter (strict on main code, lenient on tests)
+      # Run the linter on main code only
       - id: ruff
-        name: ruff (linter - main code)
+        name: ruff (linter)
         args: [--fix]
         types_or: [python, pyi]
         files: ^wiverno/
-      - id: ruff
-        name: ruff (linter - tests)
-        args:
-          - --fix
-          - --extend-ignore=SLF001,S101,S105,S106,S107,S603,S104,B007,B023,A002
-        types_or: [python, pyi]
-        files: ^tests/
-      # Run the formatter
+      # Run the formatter on all Python files
       - id: ruff-format
         name: ruff (formatter)
         types_or: [python, pyi]

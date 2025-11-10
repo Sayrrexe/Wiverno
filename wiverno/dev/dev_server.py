@@ -16,18 +16,13 @@ from typing import Any
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
-from watchdog.events import FileSystemEvent
+from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
-
-try:
-    from watchdog.events import FileSystemEventHandler
-except ImportError:
-    FileSystemEventHandler = object
 
 console = Console()
 
 
-class DebounceHandler(FileSystemEventHandler): 
+class DebounceHandler(FileSystemEventHandler):
     """
     File system event handler with debouncing to prevent excessive restarts.
 
@@ -181,7 +176,7 @@ class DevServer:
             if hasattr(app, "debug"):
                 return "[green]ON[/green]" if app.debug else "[red]OFF[/red]"
             return "[dim]Unknown[/dim]"
-        except Exception:  
+        except (ImportError, AttributeError):
             return "[dim]Unknown[/dim]"
 
     def _start_server_process(self) -> None:
@@ -218,7 +213,7 @@ server = RunServer({self.app_name}, host="{self.host}", port={self.port})
 server.start()
 """
 
-        self.process = subprocess.Popen(  
+        self.process = subprocess.Popen(  # noqa: S603
             [sys.executable, "-u", "-c", python_code],
         )
 

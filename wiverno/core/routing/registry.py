@@ -6,6 +6,7 @@ from wiverno.core.routing.patterns import PathPattern, compile_path
 
 type Handler = Callable[[Request], tuple[str, str]]
 
+
 class RouteConflictError(Exception):
     """
     Exception raised when attempting to register a route that conflicts with an existing route.
@@ -14,6 +15,7 @@ class RouteConflictError(Exception):
     - The same path and HTTP method combination is already registered
     - Overlapping method sets are registered for the same path
     """
+
 
 class RouterRegistry:
     """
@@ -31,9 +33,15 @@ class RouterRegistry:
     """
 
     HTTP_METHODS: ClassVar[list[str]] = [
-        "GET", "POST", "PUT",
-        "DELETE", "PATCH", "OPTIONS",
-        "HEAD", "TRACE", "CONNECT"
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "OPTIONS",
+        "HEAD",
+        "TRACE",
+        "CONNECT",
     ]
 
     def __init__(self) -> None:
@@ -70,7 +78,9 @@ class RouterRegistry:
         else:
             self._register_static(normalized_path, handler, methods)
 
-    def match(self,path: str,method: str) -> tuple[Handler | None, dict[str, Any] | None, bool | None]:
+    def match(
+        self, path: str, method: str
+    ) -> tuple[Handler | None, dict[str, Any] | None, bool | None]:
         """
         Find a handler for the given path and HTTP method.
 
@@ -147,7 +157,7 @@ class RouterRegistry:
             if prefix == "/":
                 prefix = ""
 
-        for path, methods_dict in other._static_routes.items():  
+        for path, methods_dict in other.static_routes.items():
             full_path = prefix + path if prefix else path
             full_path = self._normalize_path(full_path)  # Normalize after concatenation
 
@@ -156,12 +166,10 @@ class RouterRegistry:
 
             for method, handler in methods_dict.items():
                 if method in self._static_routes[full_path]:
-                    raise RouteConflictError(
-                        f"Handler for {method} {full_path} already registered"
-                    )
+                    raise RouteConflictError(f"Handler for {method} {full_path} already registered")
                 self._static_routes[full_path][method] = handler
 
-        for pattern, methods_dict in other._dynamic_routes:  
+        for pattern, methods_dict in other.dynamic_routes:
             new_pattern = pattern.with_prefix(prefix) if prefix else pattern
 
             for existing_pattern, existing_methods in self._dynamic_routes:
@@ -180,7 +188,9 @@ class RouterRegistry:
 
         self._sort_dynamic_routes()
 
-    def _register_static(self, path: str, handler: Handler, methods: list[str] | None = None) -> None:
+    def _register_static(
+        self, path: str, handler: Handler, methods: list[str] | None = None
+    ) -> None:
         """
         Register a static route (no path parameters).
 
@@ -204,14 +214,14 @@ class RouterRegistry:
 
         if conflicts:
             conflict_list = ", ".join(sorted(conflicts))
-            raise RouteConflictError(
-                f"Handler for {conflict_list} {path} already registered"
-            )
+            raise RouteConflictError(f"Handler for {conflict_list} {path} already registered")
 
         for method in methods_to_register:
             self._static_routes[path][method] = handler
 
-    def _register_dynamic(self,path: str,handler: Handler,methods: list[str] | None = None) -> None:
+    def _register_dynamic(
+        self, path: str, handler: Handler, methods: list[str] | None = None
+    ) -> None:
         """
         Register a dynamic route (with path parameters).
 
@@ -239,7 +249,7 @@ class RouterRegistry:
                     raise RouteConflictError(
                         f"Handler for {conflict_list} {path} already registered"
                     )
-                
+
                 # No conflicts, add new methods to existing pattern
                 for method in methods_to_register:
                     existing_methods[method] = handler
@@ -259,8 +269,28 @@ class RouterRegistry:
             reverse=True,
         )
 
+    @property
+    def static_routes(self) -> dict[str, dict[str, Handler]]:
+        """
+        Public read-only access to static routes.
+
+        Returns:
+            Dictionary mapping paths to methods to handlers.
+        """
+        return self._static_routes
+
+    @property
+    def dynamic_routes(self) -> list[tuple[PathPattern, dict[str, Handler]]]:
+        """
+        Public read-only access to dynamic routes.
+
+        Returns:
+            List of (pattern, methods_dict) tuples.
+        """
+        return self._dynamic_routes
+
     @staticmethod
-    def _normalize_path(path: str) -> str:
+    def normalize_path(path: str) -> str:
         """
         Normalize a URL path to a canonical form.
 
@@ -285,3 +315,16 @@ class RouterRegistry:
             path = path.rstrip("/")
 
         return path
+
+    @staticmethod
+    def _normalize_path(path: str) -> str:
+        """
+        Internal wrapper for normalize_path.
+
+        Args:
+            path: The path to normalize.
+
+        Returns:
+            The normalized path.
+        """
+        return RouterRegistry.normalize_path(path)

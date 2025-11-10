@@ -133,8 +133,7 @@ class Wiverno(RouterMixin):
                    For example, prefix="/api" will make router routes accessible
                    under /api/... paths.
         """
-        self.__registry.merge_from(router._registry, prefix)  
-
+        self.__registry.merge_from(router.registry, prefix)
 
     def __call__(
         self, environ: dict[str, Any], start_response: Callable[[str, list[tuple[str, str]]], None]
@@ -167,7 +166,7 @@ class Wiverno(RouterMixin):
             elif handler is None and method_allowed is False:
                 status, body = self.page_405(request)
             else:
-                status, body = handler(request) # type: ignore
+                status, body = handler(request)  # type: ignore
 
         except Exception:
             logger.exception("Unhandled exception in view handler")

@@ -48,7 +48,7 @@ class TestRouterInitialization:
 
         # router2 should not have router1's routes
         matched_handler, params, allowed = router2._registry.match("/users", "GET")
-        
+
         assert matched_handler is None
         assert allowed is None
 
@@ -140,12 +140,12 @@ class TestRouterIntegration:
         # Test all routes
         assert router._registry.match("/users", "GET")[0] == list_users
         assert router._registry.match("/users", "POST")[0] == create_user
-        
+
         # Dynamic routes - need valid integers
         handler, params, allowed = router._registry.match("/users/123", "GET")
         assert handler == get_user
         assert params == {"id": 123}
-        
+
         handler, params, allowed = router._registry.match("/users/456", "PUT")
         assert handler == update_user
         assert params == {"id": 456}
@@ -187,14 +187,14 @@ class TestRouterUsageExamples:
         # Verify all CRUD operations are registered
         assert router._registry.match("/api/items", "GET")[2] is True
         assert router._registry.match("/api/items", "POST")[2] is True
-        
+
         # Dynamic routes need valid integers
         handler, params, allowed = router._registry.match("/api/items/123", "GET")
         assert allowed is True
-        
+
         handler, params, allowed = router._registry.match("/api/items/456", "PUT")
         assert allowed is True
-        
+
         handler, params, allowed = router._registry.match("/api/items/789", "DELETE")
         assert allowed is True
 

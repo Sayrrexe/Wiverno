@@ -72,9 +72,9 @@ class TestWivernoWSGI:
             return "200 OK", "Test"
 
         environ = environ_factory(path="/test")
-        
+
         response_status = []
-        
+
         def start_response(status, headers):
             response_status.append(status)
 
@@ -240,7 +240,7 @@ class TestWivernoRouterInclusion:
     def test_include_multiple_routers(self, call_wsgi_app, environ_factory):
         """Test: Include multiple routers with different prefixes."""
         app = Wiverno()
-        
+
         api_v1 = Router()
         api_v2 = Router()
 
