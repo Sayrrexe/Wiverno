@@ -14,7 +14,7 @@ import json
 
 import pytest
 
-from wiverno.core.requests import HeaderParser, ParseBody, ParseQuery, Request
+from wiverno.core.requests import HeaderParser, ParseBody, QueryDict, Request
 from wiverno.main import Wiverno
 from wiverno.templating.templator import Templator
 
@@ -36,7 +36,7 @@ class TestRequestBenchmarks:
         """Benchmark: Parsing query string."""
         query = "page=1&limit=20&sort=name&order=asc&filter=active"
 
-        result = benchmark(ParseQuery.parse_input_data, query)
+        result = benchmark(QueryDict, query)
         assert len(result) == 5
 
     def test_benchmark_parse_json_body(self, benchmark, basic_environ):
