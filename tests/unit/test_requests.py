@@ -2,7 +2,7 @@
 Unit tests for requests module.
 
 Tests:
-- ParseQuery: query string parsing
+- QueryDict: query string parsing with multi-value support
 - ParseBody: request body parsing (form-data, JSON, urlencoded)
 - HeaderParser: header parsing
 - Request: creating request object from WSGI environ
@@ -12,58 +12,87 @@ import json
 
 import pytest
 
-from wiverno.core.requests import HeaderParser, ParseBody, ParseQuery, Request
+from wiverno.core.requests import HeaderParser, ParseBody, QueryDict, Request
 
 # ============================================================================
-# ParseQuery Tests
+# QueryDict Tests
 # ============================================================================
 
 
 @pytest.mark.unit
-class TestParseQuery:
-    """Tests for ParseQuery class for query string parsing."""
+class TestQueryDict:
+    """Tests for QueryDict class for query string parsing."""
 
     def test_parse_simple_query_string(self):
         """Test: Parsing simple query string."""
-        result = ParseQuery.parse_input_data("name=John&age=30")
+        result = QueryDict("name=John&age=30")
 
         assert result == {"name": "John", "age": "30"}
+        assert result["name"] == "John"
+        assert result["age"] == "30"
 
     def test_parse_empty_query_string(self):
         """Test: Empty query string returns empty dict."""
-        result = ParseQuery.parse_input_data("")
+        result = QueryDict("")
 
         assert result == {}
+        assert len(result) == 0
 
     def test_parse_query_with_special_characters(self):
         """Test: Query string with special characters."""
-        result = ParseQuery.parse_input_data("email=test%40example.com&city=New%20York")
+        result = QueryDict("email=test%40example.com&city=New%20York")
 
         assert "email" in result
         assert "city" in result
+        assert "@" in result["email"]
+        assert "New York" in result["city"]
 
     def test_parse_query_with_multiple_values(self):
-        """Test: Parameter with multiple values - first one is taken."""
-        result = ParseQuery.parse_input_data("id=1&id=2&id=3")
+        """Test: Parameter with multiple values - first one is accessible via dict."""
+        result = QueryDict("id=1&id=2&id=3")
 
-        # Should only have the first value
+        # Dict access returns first value
         assert result["id"] == "1"
+        # getlist() returns all values
+        assert result.getlist("id") == ["1", "2", "3"]
 
-    def test_get_request_params_from_environ(self, basic_environ):
-        """Test: Extracting parameters from WSGI environ."""
-        basic_environ["QUERY_STRING"] = "page=1&limit=10"
+    def test_getlist_method(self):
+        """Test: getlist() returns all values for a key."""
+        result = QueryDict("tag=python&tag=django&tag=web")
 
-        result = ParseQuery.get_request_params(basic_environ)
+        assert result.getlist("tag") == ["python", "django", "web"]
+        assert result["tag"] == "python"  # First value via dict access
 
-        assert result == {"page": "1", "limit": "10"}
+    def test_getlist_missing_key(self):
+        """Test: getlist() returns empty list for missing key."""
+        result = QueryDict("name=John")
 
-    def test_get_request_params_no_query_string(self, basic_environ):
-        """Test: Missing QUERY_STRING returns empty dict."""
-        basic_environ.pop("QUERY_STRING", None)
+        assert result.getlist("missing") == []
+        assert result.getlist("missing", ["default"]) == ["default"]
 
-        result = ParseQuery.get_request_params(basic_environ)
+    def test_get_method(self):
+        """Test: get() method with default value."""
+        result = QueryDict("name=John")
 
-        assert result == {}
+        assert result.get("name") == "John"
+        assert result.get("missing") is None
+        assert result.get("missing", "default") == "default"
+
+    def test_setitem_single_value(self):
+        """Test: Setting single value."""
+        result = QueryDict()
+        result["name"] = "John"
+
+        assert result["name"] == "John"
+        assert result.getlist("name") == ["John"]
+
+    def test_setitem_list_value(self):
+        """Test: Setting list of values."""
+        result = QueryDict()
+        result["tags"] = ["python", "web", "django"]
+
+        assert result["tags"] == "python"  # First value
+        assert result.getlist("tags") == ["python", "web", "django"]
 
 
 # ============================================================================

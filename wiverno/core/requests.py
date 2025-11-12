@@ -5,37 +5,79 @@ from typing import Any
 from urllib.parse import parse_qs, unquote
 
 
-class ParseQuery:
+class QueryDict(dict):
     """
-    Utility class for parsing query strings from URLs.
+    A dictionary subclass for handling query string parameters with support for multiple values.
+
+    Attributes:
+        _list_data (dict[str, list[str]]): Internal storage for all parameter values.
     """
 
-    @staticmethod
-    def parse_input_data(data: str) -> dict[str, str]:
+    def __init__(self, query_string: str = "") -> None:
         """
-        Parses a query string into a dictionary.
+        Initialize a QueryDict from a query string.
+        
+        Args:
+            query_string (str): URL query string to parse (without leading '?').
+                               Empty values are preserved. Defaults to empty string.
+        """
+        super().__init__()
+        self._list_data = {}
+
+        if query_string:
+            parsed = parse_qs(query_string, keep_blank_values=True)
+            for key, values in parsed.items():
+                self._list_data[key] = values
+                super().__setitem__(key, values[0] if values else "")
+
+    def get(self, key: str, default: Any = None) -> Any:
+        """
+        Get the first value for a given key.
+
+        This method overrides dict.get() for clarity and consistency.
+        Returns the first value if the key has multiple values.
 
         Args:
-            data (str): The query string to parse.
+            key (str): The parameter name to retrieve.
+            default (Any, optional): Default value if key not found. Defaults to None.
 
         Returns:
-            Dict[str, str]: A dictionary mapping parameter names to their first values.
+            Any: The first value associated with the key, or default if not found.
         """
-        return {k: v[0] for k, v in parse_qs(data).items()}
+        return super().get(key, default)
 
-    @staticmethod
-    def get_request_params(environ: dict[str, Any]) -> dict[str, str]:
+    def getlist(self, key: str, default: list[str] | None = None) -> list[str]:
         """
-        Retrieves and parses the query string from the WSGI environment.
+        Get all values for a given key as a list.
+        
+        Args:
+            key (str): The parameter name to retrieve.
+            default (list[str], optional): Default value if key not found.
+                                          Defaults to empty list.
+
+        Returns:
+            list[str]: List of all values associated with the key, or default if not found.
+        """
+        return self._list_data.get(key, default or [])
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        """
+        Set a value for a given key, replacing any existing values.
+
+        If a list is provided, stores all values but exposes only the first
+        via dict interface. If a single value is provided, converts it to a list.
 
         Args:
-            environ (dict): The WSGI environment dictionary.
-
-        Returns:
-            dict: A dictionary with parsed query parameters.
+            key (str): The parameter name to set.
+            value (Any): The value(s) to set. Can be a single value or a list.
+                        Single values are converted to strings and stored as a list.
         """
-        query_string = environ.get("QUERY_STRING", "")
-        return ParseQuery.parse_input_data(query_string)
+        if isinstance(value, list):
+            self._list_data[key] = value
+            super().__setitem__(key, value[0] if value else "")
+        else:
+            self._list_data[key] = [str(value)]
+            super().__setitem__(key, str(value))
 
 
 class ParseBody:
@@ -115,7 +157,7 @@ class Request:
         method (str): HTTP method (GET, POST, etc.).
         path (str): The request path.
         headers (Dict[str, str]): HTTP headers.
-        query_params (Dict[str, Any]): Parsed query string parameters.
+        query_params (QueryDict): Parsed query string parameters.
         data (Dict[str, Any]): Parsed request body.
         cookies (Dict[str, str]): Cookies from the request.
         content_type (str): Content-Type header value.
@@ -132,7 +174,7 @@ class Request:
     method: str
     path: str
     headers: dict[str, str]
-    query_params: dict[str, Any]
+    query_params: QueryDict
     data: dict[str, Any]
     cookies: dict[str, str]
     content_type: str
@@ -157,7 +199,7 @@ class Request:
         self.method: str = environ.get("REQUEST_METHOD", "GET").upper()
         self.path: str = self._get_path()
         self.headers: dict[str, str] = HeaderParser.get_headers(environ)
-        self.query_params: dict[str, Any] = ParseQuery.get_request_params(environ)
+        self.query_params: QueryDict = QueryDict(environ.get("QUERY_STRING", ""))
         self._raw_data = environ["wsgi.input"].read(self._parse_content_length())
         self.data = ParseBody.get_request_params(environ, self._raw_data)
         self.cookies: dict[str, str] = self._parse_cookies()
