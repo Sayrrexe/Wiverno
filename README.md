@@ -33,7 +33,7 @@ For contributors and developers:
 ## Minimal example
 
 ```python
-from wiverno.main import Wiverno
+from wiverno import Wiverno
 
 app = Wiverno()
 
