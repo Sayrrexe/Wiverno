@@ -16,7 +16,7 @@ class QueryDict(dict):
     def __init__(self, query_string: str = "") -> None:
         """
         Initialize a QueryDict from a query string.
-        
+
         Args:
             query_string (str): URL query string to parse (without leading '?').
                                Empty values are preserved. Defaults to empty string.
@@ -49,7 +49,7 @@ class QueryDict(dict):
     def getlist(self, key: str, default: list[str] | None = None) -> list[str]:
         """
         Get all values for a given key as a list.
-        
+
         Args:
             key (str): The parameter name to retrieve.
             default (list[str], optional): Default value if key not found.

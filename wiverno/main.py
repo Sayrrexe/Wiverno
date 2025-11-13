@@ -1,9 +1,10 @@
 import logging
 import traceback
 from collections.abc import Callable
-from pathlib import Path
 from typing import Any
 
+from wiverno.core.config import WivernoConfig
+from wiverno.core.default_pages import InternalServerError500, MethodNotAllowed405, PageNotFound404
 from wiverno.core.requests import Request
 from wiverno.core.routing.base import RouterMixin
 from wiverno.core.routing.registry import RouterRegistry
@@ -16,72 +17,6 @@ type Handler = Callable[[Request], tuple[str, str]]
 type ErrorHandler = Callable[[Request, str | None], tuple[str, str]]
 
 
-BASE_DIR = Path(__file__).resolve().parent
-DEFAULT_TEMPLATE_PATH = BASE_DIR / "static" / "templates"
-
-
-class PageNotFound404:
-    """
-    Default 404 error handler that renders the error_404.html template.
-    """
-
-    def __call__(self, _request: Request) -> tuple[str, str]:
-        """
-        Handles 404 Not Found errors.
-
-        Args:
-            request (Request): The incoming request object.
-
-        Returns:
-            tuple[str, str]: A tuple of (status, html_body).
-        """
-        templator = Templator(folder=DEFAULT_TEMPLATE_PATH)
-        return "404 NOT FOUND", templator.render("error_404.html")
-
-
-class MethodNotAllowed405:
-    """
-    Default 405 error handler that renders the error_405.html template.
-    """
-
-    def __call__(self, request: Request) -> tuple[str, str]:
-        """
-        Handles 405 Method Not Allowed errors.
-
-        Args:
-            request (Request): The incoming request object.
-
-        Returns:
-            tuple[str, str]: A tuple of (status, html_body).
-        """
-        templator = Templator(folder=DEFAULT_TEMPLATE_PATH)
-        return "405 METHOD NOT ALLOWED", templator.render(
-            "error_405.html", content={"method": request.method}
-        )
-
-
-class InternalServerError500:
-    """
-    Default 500 error handler that renders the error_500.html template.
-    """
-
-    def __call__(self, _request: Request, error_traceback: str | None = None) -> tuple[str, str]:
-        """
-        Handles 500 Internal Server Error.
-
-        Args:
-            request (Request): The incoming request object.
-            error_traceback (str, optional): The traceback string if debug mode is enabled.
-
-        Returns:
-            tuple[str, str]: A tuple of (status, html_body).
-        """
-        templator = Templator(folder=DEFAULT_TEMPLATE_PATH)
-        return "500 INTERNAL SERVER ERROR", templator.render(
-            "error_500.html", content={"traceback": error_traceback}
-        )
-
-
 class Wiverno(RouterMixin):
     """
     A simple WSGI-compatible web framework.
@@ -90,7 +25,7 @@ class Wiverno(RouterMixin):
     def __init__(
         self,
         debug_mode: bool = True,
-        system_template_path: str = str(DEFAULT_TEMPLATE_PATH),
+        system_template_path: str = str(WivernoConfig.DEFAULT_TEMPLATE_PATH),
         page_404: Callable[[Request], tuple[str, str]] = PageNotFound404(),
         page_405: Callable[[Request], tuple[str, str]] = MethodNotAllowed405(),
         page_500: Callable[[Request, str | None], tuple[str, str]] = InternalServerError500(),
