@@ -40,12 +40,43 @@ def handle_request(request):
 def show_path(request):
     """Display request path."""
     path = request.path  # e.g., "/users/123"
-    return "200 OK", f"Path: {path}"
+    return "200 OK", f"<p>Path: {path}</p>"
 ```
+
+### Path Parameters
+
+Extract parameters from dynamic URL segments:
+
+```python
+@app.get("/users/{id:int}")
+def get_user(request):
+    """Get user by ID from path parameter."""
+    user_id = request.path_params["id"]  # Already converted to int
+    return "200 OK", f"<h1>User ID: {user_id}</h1>"
+
+@app.get("/posts/{slug}/comments/{comment_id:int}")
+def get_comment(request):
+    """Get comment with multiple path parameters."""
+    slug = request.path_params["slug"]           # str
+    comment_id = request.path_params["comment_id"]  # int
+    return "200 OK", f"<p>Post: {slug}, Comment: {comment_id}</p>"
+
+@app.get("/files/{filepath:path}")
+def serve_file(request):
+    """Path parameter can contain slashes."""
+    filepath = request.path_params["filepath"]  # e.g., "docs/guide/intro.md"
+    return "200 OK", f"<p>File: {filepath}</p>"
+```
+
+**Supported types:**
+- `{name}` or `{name:str}` - String (default)
+- `{name:int}` - Integer (automatically converted)
+- `{name:float}` - Float (automatically converted)
+- `{name:path}` - Path (can contain slashes)
 
 ### Query Parameters
 
-Parse query strings from GET requests:
+Parse query strings from GET requests using `QueryDict`:
 
 ```python
 def search(request):
@@ -56,8 +87,27 @@ def search(request):
     page = request.query_params.get("page", "1")      # "2"
     limit = request.query_params.get("limit", "10")   # "10"
 
-    return "200 OK", f"Search: {query}, Page: {page}"
+    return "200 OK", f"<p>Search: {query}, Page: {page}</p>"
+```
 
+**QueryDict** supports both single and multiple values:
+
+```python
+def search_with_tags(request):
+    """Handle multiple query parameter values."""
+    # URL: /search?q=python&tag=web&tag=framework&tag=wsgi
+
+    # Get single value (first occurrence)
+    query = request.query_params.get("q", "")  # "python"
+    query = request.query_params["q"]          # Same, but raises KeyError if missing
+
+    # Get all values for a parameter
+    tags = request.query_params.getlist("tag")  # ["web", "framework", "wsgi"]
+
+    # Get with default if not present
+    categories = request.query_params.getlist("category", ["general"])  # ["general"]
+
+    return "200 OK", f"<p>Query: {query}, Tags: {', '.join(tags)}</p>"
 ```
 
 ### POST Data
@@ -248,18 +298,26 @@ def upload(request):
 
 Wiverno provides utility classes for parsing:
 
-### ParseQuery
+### QueryDict
+
+The `QueryDict` class handles query parameters with support for multiple values:
 
 ```python
-from wiverno.core.requests import ParseQuery
+from wiverno.core.requests import QueryDict
 
 # Parse query string
-query_string = "name=John&age=30"
-params = ParseQuery.parse_input_data(query_string)
-# {"name": "John", "age": "30"}
+query_dict = QueryDict("name=John&age=30&tag=python&tag=web")
 
-# Get from environ
-params = ParseQuery.get_request_params(environ)
+# Get single values
+name = query_dict.get("name")  # "John"
+age = query_dict["age"]        # "30"
+
+# Get multiple values
+tags = query_dict.getlist("tag")  # ["python", "web"]
+
+# Iteration (returns first value for each key)
+for key in query_dict:
+    print(f"{key}: {query_dict[key]}")
 ```
 
 ### ParseBody
