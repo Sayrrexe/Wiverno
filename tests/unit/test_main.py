@@ -15,10 +15,12 @@ import pytest
 
 from wiverno.core.requests import Request
 from wiverno.main import (
+    Wiverno,
+)
+from wiverno.core.default_pages import (
     InternalServerError500,
     MethodNotAllowed405,
     PageNotFound404,
-    Wiverno,
 )
 
 # ============================================================================
