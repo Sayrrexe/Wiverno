@@ -7,7 +7,7 @@
 Clone the repository and install the package using `pip`:
 
 ```bash
-pip install .
+pip install wiverno
 ```
 
 ## Minimal example
