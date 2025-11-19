@@ -2259,7 +2259,7 @@
 <li><code>--watch, -w</code> - Comma-separated directories to watch</li>
 </ul>
 <p><strong>Example:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># app.py</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># run.py</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>from<span class="w"> </span>wiverno.main<span class="w"> </span>import<span class="w"> </span>Wiverno
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nv">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>Wiverno<span class="o">()</span>
@@ -2269,7 +2269,7 @@
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s2">&quot;200 OK&quot;</span>,<span class="w"> </span><span class="s2">&quot;Hello, World!&quot;</span>
 </span></code></pre></div>
 <p>Run:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>wiverno<span class="w"> </span>run<span class="w"> </span>dev<span class="w"> </span>--app-module<span class="w"> </span>app
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>wiverno<span class="w"> </span>run<span class="w"> </span>dev
 </span></code></pre></div>
 <p>The server will automatically reload when you modify Python files.</p>
 <h3 id="production-server">Production Server<a class="headerlink" href="#production-server" title="Permanent link">&para;</a></h3>

@@ -1049,9 +1049,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#module-wivernocorerouter" class="md-nav__link">
+  <a href="#module-wivernocoreroutingrouter" class="md-nav__link">
     <span class="md-ellipsis">
-      Module: wiverno.core.router
+      Module: wiverno.core.routing.router
     </span>
   </a>
   
@@ -2127,8 +2127,8 @@
 
 
 <h1 id="router">Router<a class="headerlink" href="#router" title="Permanent link">&para;</a></h1>
-<p>The <code>Router</code> class provides a way to organize and group routes separately from the main <code>Wiverno</code> application. Routes defined in a router can be included in a Wiverno application using <code>include_router()</code>.</p>
-<h2 id="module-wivernocorerouter">Module: <code>wiverno.core.router</code><a class="headerlink" href="#module-wivernocorerouter" title="Permanent link">&para;</a></h2>
+<p>The <code>Router</code> class provides a way to organize and group routes separately from the main <code>Wiverno</code> application. Routes defined in a router can be included in the main application using <code>include_router()</code>.</p>
+<h2 id="module-wivernocoreroutingrouter">Module: <code>wiverno.core.routing.router</code><a class="headerlink" href="#module-wivernocoreroutingrouter" title="Permanent link">&para;</a></h2>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <p>Routers are useful for organizing your application into logical modules:</p>
 <ul>
@@ -2138,7 +2138,7 @@
 </ul>
 <p>Routes from a router are included in the main application with an optional URL prefix.</p>
 <h2 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h2>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">wiverno.core.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">wiverno.core.routing.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># Create a router</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">api_router</span> <span class="o">=</span> <span class="n">Router</span><span class="p">()</span>
@@ -2218,10 +2218,12 @@
 <h3 id="route-retrieval">Route Retrieval<a class="headerlink" href="#route-retrieval" title="Permanent link">&para;</a></h3>
 <h4 id="routerget_routes-listdict"><code>router.get_routes() -&gt; list[dict]</code><a class="headerlink" href="#routerget_routes-listdict" title="Permanent link">&para;</a></h4>
 <p>Returns all registered routes in the router.</p>
-<p><strong>Returns:</strong> List of route dictionaries with keys:
-- <code>path</code> (str): Route path
-- <code>handler</code> (Callable): Handler function
-- <code>methods</code> (list[str] | None): Allowed HTTP methods</p>
+<p><strong>Returns:</strong> List of route dictionaries with keys:</p>
+<ul>
+<li><code>path</code> (str): Route path</li>
+<li><code>handler</code> (Callable): Handler function</li>
+<li><code>methods</code> (list[str] | None): Allowed HTTP methods</li>
+</ul>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">router</span> <span class="o">=</span> <span class="n">Router</span><span class="p">()</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/data&quot;</span><span class="p">)</span>
@@ -2236,7 +2238,7 @@
 <h3 id="including-routers">Including Routers<a class="headerlink" href="#including-routers" title="Permanent link">&para;</a></h3>
 <p>Use <code>app.include_router()</code> to add router routes to your Wiverno application.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">wiverno.main</span><span class="w"> </span><span class="kn">import</span> <span class="n">Wiverno</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">wiverno.core.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">wiverno.core.routing.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Create routers</span>
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">api_router</span> <span class="o">=</span> <span class="n">Router</span><span class="p">()</span>
@@ -2286,7 +2288,7 @@
 </span></code></pre></div>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
 <h3 id="api-router">API Router<a class="headerlink" href="#api-router" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">wiverno.core.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">wiverno.core.routing.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">wiverno.core.requests</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
 </span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">api_router</span> <span class="o">=</span> <span class="n">Router</span><span class="p">()</span>
@@ -2306,7 +2308,7 @@
 </span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>    <span class="k">return</span> <span class="s2">&quot;200 OK&quot;</span><span class="p">,</span> <span class="s1">&#39;{&quot;id&quot;: 1, &quot;title&quot;: &quot;First&quot;}&#39;</span>
 </span></code></pre></div>
 <h3 id="nested-router-prefixes">Nested Router Prefixes<a class="headerlink" href="#nested-router-prefixes" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">wiverno.core.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">wiverno.core.routing.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">wiverno.main</span><span class="w"> </span><span class="kn">import</span> <span class="n">Wiverno</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># V1 API routes</span>
