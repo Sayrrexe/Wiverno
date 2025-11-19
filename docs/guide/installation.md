@@ -116,7 +116,7 @@ wiverno help
 
 Wiverno has minimal dependencies by default. The only required dependency is:
 
-- **Jinja2** (>=3.1.6) - Template engine
+- **Jinja2** (>=3.1) - Template engine
 
 Development dependencies (optional):
 
