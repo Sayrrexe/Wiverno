@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
 Run with:
 ```bash
-python app.py
+python run.py
 # Server running at http://localhost:8000
 ```
 

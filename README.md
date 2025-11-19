@@ -39,7 +39,12 @@ app = Wiverno()
 
 @app.get("/")
 def index(request):
-    return "200 OK", "Hello, World!"
+    return "200 OK", "<h1>Hello, World!</h1>"
+
+@app.get("/users/{id:int}")
+def get_user(request):
+    user_id = request.path_params["id"]
+    return "200 OK", f"<h1>User {user_id}</h1>"
 ```
 
 ## Running

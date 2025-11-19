@@ -12,10 +12,10 @@ Let's create a simple "Hello, World!" application.
 
 ### Step 1: Create a Python File
 
-Create a new file called `app.py`:
+Create a new file called `run.py`:
 
 ```python
-from wiverno.main import Wiverno
+from wiverno import Wiverno
 
 app = Wiverno()
 
@@ -30,7 +30,7 @@ def index(request):
 Use the Wiverno CLI to start the development server:
 
 ```bash
-wiverno run dev app:app
+wiverno run dev
 ```
 
 You should see output like:
@@ -51,76 +51,99 @@ Congratulations! 🎉 You've created your first Wiverno application!
 Let's expand the application with more routes using decorators:
 
 ```python
-from wiverno.main import Wiverno
+from wiverno import Wiverno
 
 app = Wiverno()
 
 @app.get("/")
 def index(request):
     """Homepage view."""
-    return "200 OK", "Hello, World!"
+    return "200 OK", "<h1>Hello, World!</h1>"
 
 @app.get("/about")
 def about(request):
     """About page view."""
-    return "200 OK", "This is the about page"
+    return "200 OK", "<h1>About</h1><p>This is the about page</p>"
 
+@app.get("/users/{id:int}")
+def user_detail(request):
+    """User detail with path parameter."""
+    user_id = request.path_params["id"]
+    return "200 OK", f"<h1>User {user_id}</h1>"
 ```
 
 Run with:
 
 ```bash
-wiverno run dev app:app
+wiverno run dev
 ```
 
 Now you can visit:
 
 - [http://localhost:8000/](http://localhost:8000/) - Homepage
 - [http://localhost:8000/about](http://localhost:8000/about) - About page
+- [http://localhost:8000/users/42](http://localhost:8000/users/42) - User detail
 
 ## Handling Different HTTP Methods
 
 You can handle different HTTP methods using method-specific decorators:
 
 ```python
-from wiverno.main import Wiverno
+from wiverno import Wiverno
 
 app = Wiverno()
 
 @app.get("/users")
 def get_users(request):
     """Handle GET requests - list users."""
-    return "200 OK", "Get user list"
+    return "200 OK", "<ul><li>User 1</li><li>User 2</li></ul>"
 
 @app.post("/users")
 def create_user(request):
     """Handle POST requests - create user."""
-    return "201 CREATED", "User created"
+    name = request.data.get("name", "")
+    return "201 CREATED", f"<p>User {name} created</p>"
+
+@app.get("/users/{id:int}")
+def get_user(request):
+    """Handle GET requests - get user by ID."""
+    user_id = request.path_params["id"]
+    return "200 OK", f"<h1>User {user_id}</h1>"
 ```
 
 Or use class-based views for better organization:
 
 ```python
 from wiverno.views.base_views import BaseView
+from wiverno import Wiverno
 
 class UserView(BaseView):
-    """Handle user-related requests."""
+    """Handle single user operations."""
 
     def get(self, request):
-        return "200 OK", "Get user info"
-
-    def post(self, request):
-        return "201 CREATED", "User created"
+        user_id = request.path_params["id"]
+        return "200 OK", f"<h1>User {user_id}</h1>"
 
     def put(self, request):
-        return "200 OK", "User updated"
+        user_id = request.path_params["id"]
+        return "200 OK", f"<p>User {user_id} updated</p>"
 
     def delete(self, request):
         return "204 NO CONTENT", ""
 
-app = Wiverno(routes_list=[
-    ("/users", UserView()),
-])
+class UserListView(BaseView):
+    """Handle user list operations."""
+
+    def get(self, request):
+        return "200 OK", "<ul><li>User 1</li><li>User 2</li></ul>"
+
+    def post(self, request):
+        name = request.data.get("name", "")
+        return "201 CREATED", f"<p>User {name} created</p>"
+
+app = Wiverno()
+app.route("/users")(UserListView())
+app.route("/users/{id:int}")(UserView())
 ```
 
 ## Using Templates
@@ -168,6 +191,25 @@ app = Wiverno()
 
 ## Working with Request Data
 
+### Path Parameters
+
+```python
+@app.get("/users/{id:int}")
+def user_detail(request):
+    """Get user by ID from URL path."""
+    user_id = request.path_params["id"]  # Automatically converted to int
+    return "200 OK", f"<h1>User {user_id}</h1>"
+
+@app.get("/posts/{slug}/comments/{comment_id:int}")
+def post_comment(request):
+    """Multiple path parameters."""
+    slug = request.path_params["slug"]
+    comment_id = request.path_params["comment_id"]
+    return "200 OK", f"<p>Post: {slug}, Comment: {comment_id}</p>"
+```
+
+Visit: [http://localhost:8000/users/42](http://localhost:8000/users/42)
+
 ### Query Parameters
 
 ```python
@@ -175,10 +217,11 @@ app = Wiverno()
 def search(request):
     """Search page with query parameters."""
     query = request.query_params.get("q", "")
-    return "200 OK", f"Searching for: {query}"
+    tags = request.query_params.getlist("tag")  # Get multiple values
+    return "200 OK", f"<p>Searching for: {query}, Tags: {', '.join(tags)}</p>"
 ```
 
-Visit: [http://localhost:8000/search?q=python](http://localhost:8000/search?q=python)
+Visit: [http://localhost:8000/search?q=python&tag=web&tag=framework](http://localhost:8000/search?q=python&tag=web&tag=framework)
 
 ### POST Data
 
@@ -209,12 +252,6 @@ def headers_info(request):
 **Always use the Wiverno CLI for development** - it provides auto-reload:
 
 ```bash
-wiverno run dev --app-module app --app-name app
-```
-
-Or with default module name:
-
-```bash
 wiverno run dev
 ```
 
@@ -226,8 +263,19 @@ You can configure the server with custom host and port using CLI options:
 
 ```bash
 # Custom host and port
-wiverno run dev --host 0.0.0.0 --port 5000 --app-module myapp --app-name application
+wiverno run dev --host 0.0.0.0 --port 5000 
 ```
+
+And
+
+```bash
+# Custom app and file names
+wiverno run dev --app-module myapp --app-name application
+```
+
+where:
+- `--app-module` — the name of the application module file
+- `--app-name` — the name of the main application variable in Wiverno
 
 For production, use a production WSGI server like gunicorn or waitress (see deployment docs).
 

@@ -222,7 +222,7 @@ Displays:
 
 ### Basic Development Setup
 
-1. Create your application file `app.py`:
+1. Create your application file `run.py`:
 
 ```python
 from wiverno.main import Wiverno

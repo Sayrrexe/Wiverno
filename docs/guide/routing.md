@@ -86,73 +86,122 @@ def handle_data(request):
 
 ## Path Parameters
 
-Wiverno uses static path matching - routes are matched exactly as defined. Dynamic path parameters (like `/user/<id>`) are not currently supported.
+Wiverno supports dynamic path parameters with FastAPI-style syntax and automatic type conversion.
 
-For dynamic content based on URL segments, use query parameters instead:
+### Basic Path Parameters
+
+Define path parameters using curly braces:
+
+```python
+@app.get("/users/{id}")
+def user_detail(request):
+    """Get user by ID from path parameter."""
+    user_id = request.path_params["id"]  # String by default
+    return "200 OK", f"<h1>User: {user_id}</h1>"
+
+# Usage: /users/123
+# request.path_params = {"id": "123"}
+```
+
+### Typed Path Parameters
+
+Add type hints for automatic conversion:
+
+```python
+@app.get("/users/{id:int}")
+def get_user(request):
+    """Get user with integer ID."""
+    user_id = request.path_params["id"]  # Already converted to int
+    return "200 OK", f"<h1>User ID: {user_id}</h1>"
+
+@app.get("/products/{price:float}")
+def get_product_by_price(request):
+    """Get products by price."""
+    price = request.path_params["price"]  # Already converted to float
+    return "200 OK", f"<p>Price: ${price:.2f}</p>"
+
+# Usage: /users/123 -> user_id = 123 (int)
+# Usage: /products/19.99 -> price = 19.99 (float)
+```
+
+### Supported Parameter Types
+
+- `{name}` - String parameter (default, matches `[^/]+`)
+- `{name:str}` - Explicit string parameter
+- `{name:int}` - Integer parameter (matches `[0-9]+`)
+- `{name:float}` - Float parameter (matches `[0-9]+\.?[0-9]*`)
+- `{name:path}` - Path parameter (matches `.+`, includes slashes)
+
+### Multiple Path Parameters
+
+Combine multiple parameters in one route:
+
+```python
+@app.get("/posts/{slug}/comments/{comment_id:int}")
+def get_comment(request):
+    """Get comment from specific post."""
+    slug = request.path_params["slug"]           # str
+    comment_id = request.path_params["comment_id"]  # int
+    return "200 OK", f"<p>Post: {slug}, Comment: {comment_id}</p>"
+
+# Usage: /posts/hello-world/comments/42
+# request.path_params = {"slug": "hello-world", "comment_id": 42}
+```
+
+### Path Parameter for File Paths
+
+Use `:path` type to capture paths with slashes:
+
+```python
+@app.get("/files/{filepath:path}")
+def serve_file(request):
+    """Serve file from nested path."""
+    filepath = request.path_params["filepath"]  # Can contain slashes
+    return "200 OK", f"<p>File: {filepath}</p>"
+
+# Usage: /files/docs/guide/intro.md
+# request.path_params = {"filepath": "docs/guide/intro.md"}
+```
 
 ### Using Query Parameters
 
-Extract values from query strings:
+Query parameters work alongside path parameters:
 
 ```python
-@app.get("/user")
-def user_detail(request):
-    """Get user by ID from query parameter."""
-    user_id = request.query_params.get("id")
-    if user_id:
-        return "200 OK", f"User ID: {user_id}"
-    return "200 OK", "Please provide user ID"
+@app.get("/users/{id:int}/posts")
+def user_posts(request):
+    """Get user's posts with pagination."""
+    user_id = request.path_params["id"]          # From path
+    limit = request.query_params.get("limit", "10")   # From query string
+    offset = request.query_params.get("offset", "0")
+    return "200 OK", f"<p>User {user_id}: Posts (limit={limit}, offset={offset})</p>"
 
-# Usage: /user?id=123
-# request.query_params = {"id": "123"}
+# Usage: /users/42/posts?limit=20&offset=10
 ```
 
-### Multiple Query Parameters
+### Multiple Query Parameter Values
 
-Handle multiple query parameters:
+Use `getlist()` for repeated query parameters:
 
 ```python
 @app.get("/search")
 def search(request):
-    """Search with multiple parameters."""
+    """Search with multiple tags."""
+    tags = request.query_params.getlist("tag")  # Get all tag values
     query = request.query_params.get("q", "")
-    limit = request.query_params.get("limit", "10")
-    offset = request.query_params.get("offset", "0")
-    return "200 OK", f"Search: {query}, Limit: {limit}, Offset: {offset}"
+    return "200 OK", f"<p>Search: {query}, Tags: {', '.join(tags)}</p>"
 
-# Usage: /search?q=python&limit=20&offset=10
+# Usage: /search?q=python&tag=web&tag=framework&tag=wsgi
+# request.query_params.getlist("tag") = ["web", "framework", "wsgi"]
 ```
-
-## Using Route Lists
-
-For simple applications or when migrating, you can use route lists:
-
-```python
-from wiverno.main import Wiverno
-
-def index(request):
-    """Homepage view."""
-    return "200 OK", "Welcome to Wiverno!"
-
-def about(request):
-    """About page view."""
-    return "200 OK", "About Us"
-
-app = Wiverno(routes_list=[
-    ("/", index),
-    ("/about", about),
-])
-```
-
-However, **decorators are preferred** for better code organization.
 
 ## Using Router Class
 
 For modular applications, use the `Router` class:
 
 ```python
-from wiverno.core.router import Router
-from wiverno.main import Wiverno
+from wiverno.core.routing.router import Router
+from wiverno import Wiverno
 
 # Create a router for API endpoints
 api_router = Router()
@@ -167,15 +216,20 @@ def api_create_user(request):
     """API: Create user."""
     return "201 CREATED", '{"id": 1}'
 
-@api_router.get("/users/detail")
+@api_router.get("/users/{id:int}")
 def api_user_detail(request):
     """API: Get user details."""
-    user_id = request.query_params.get("id")
+    user_id = request.path_params["id"]  # int from path
     return "200 OK", f'{{"id": {user_id}}}'
 
 # Create app and include router
 app = Wiverno()
 app.include_router(api_router, prefix="/api/v1")
+
+# Routes become:
+# GET  /api/v1/users
+# POST /api/v1/users
+# GET  /api/v1/users/{id:int}
 ```
 
 ### Router with Prefix
@@ -189,13 +243,20 @@ blog_router = Router()
 @blog_router.get("/")
 def blog_index(request):
     """Blog homepage."""
-    return "200 OK", "Blog posts"
+    return "200 OK", "<h1>Blog posts</h1>"
 
-@blog_router.get("/post")
+@blog_router.get("/{slug}")
 def blog_post(request):
     """Single blog post."""
-    slug = request.query_params.get("slug")
-    return "200 OK", f"Post: {slug}"
+    slug = request.path_params["slug"]
+    return "200 OK", f"<h1>Post: {slug}</h1>"
+
+@blog_router.get("/{slug}/comments/{comment_id:int}")
+def blog_comment(request):
+    """Single comment on a blog post."""
+    slug = request.path_params["slug"]
+    comment_id = request.path_params["comment_id"]
+    return "200 OK", f"<p>Comment {comment_id} on {slug}</p>"
 
 # Admin routes
 admin_router = Router()
@@ -203,7 +264,13 @@ admin_router = Router()
 @admin_router.get("/dashboard")
 def admin_dashboard(request):
     """Admin dashboard."""
-    return "200 OK", "Admin Dashboard"
+    return "200 OK", "<h1>Admin Dashboard</h1>"
+
+@admin_router.get("/users/{id:int}")
+def admin_user(request):
+    """Admin user details."""
+    user_id = request.path_params["id"]
+    return "200 OK", f"<h1>Admin: User {user_id}</h1>"
 
 # Combine in app
 app = Wiverno()
@@ -212,8 +279,10 @@ app.include_router(admin_router, prefix="/admin")
 
 # Routes:
 # /blog/ -> blog_index
-# /blog/post?slug=my-post -> blog_post
+# /blog/my-first-post -> blog_post
+# /blog/my-first-post/comments/5 -> blog_comment
 # /admin/dashboard -> admin_dashboard
+# /admin/users/42 -> admin_user
 ```
 
 ## Path Normalization
@@ -238,21 +307,58 @@ Root path is special:
 
 ## Route Priority
 
-Routes are matched exactly as defined. More specific paths should be defined first to take precedence:
+Routes are matched with intelligent priority:
+
+### Static Routes Take Precedence
+
+Static routes (without parameters) are checked first with O(1) lookup:
 
 ```python
-# Define more specific routes first
-@app.get("/users/admin")  # Specific route for admin
+@app.get("/users/admin")  # Static route - checked first
 def admin_users(request):
-    return "200 OK", "Admin users"
+    return "200 OK", "<h1>Admin users</h1>"
 
-@app.get("/users")  # General users route
+@app.get("/users/{id:int}")  # Dynamic route - checked after static
 def user_detail(request):
-    return "200 OK", "User detail"
+    user_id = request.path_params["id"]
+    return "200 OK", f"<h1>User {user_id}</h1>"
 
-# /users/admin -> admin_users
-# /users -> user_detail
-# /users/123 -> 404 (not found - no pattern matching)
+# /users/admin -> admin_users (static route wins)
+# /users/123 -> user_detail (dynamic route matches)
+```
+
+### Dynamic Route Specificity
+
+Dynamic routes are sorted by specificity (more segments = higher priority):
+
+```python
+@app.get("/posts/{slug}/comments/{id:int}")  # 4 segments - higher priority
+def post_comment(request):
+    slug = request.path_params["slug"]
+    comment_id = request.path_params["id"]
+    return "200 OK", f"<p>Comment {comment_id} on {slug}</p>"
+
+@app.get("/posts/{slug}")  # 2 segments - lower priority
+def post_detail(request):
+    slug = request.path_params["slug"]
+    return "200 OK", f"<h1>Post: {slug}</h1>"
+
+# /posts/hello-world/comments/5 -> post_comment (more specific)
+# /posts/hello-world -> post_detail
+```
+
+### Route Conflict Detection
+
+Registering the same path+method twice raises an error:
+
+```python
+@app.get("/users")
+def users1(request):
+    return "200 OK", "Users v1"
+
+@app.get("/users")  # ❌ Raises RouteConflictError
+def users2(request):
+    return "200 OK", "Users v2"
 ```
 
 ## Class-Based Views with Routes
@@ -261,34 +367,40 @@ Use class-based views for better organization:
 
 ```python
 from wiverno.views.base_views import BaseView
+from wiverno import Wiverno
 
 class UserView(BaseView):
     """Handle user operations."""
 
     def get(self, request):
-        """List users or get user by ID."""
-        user_id = request.query_params.get("id")
-        if user_id:
-            return "200 OK", f"User {user_id}"
-        return "200 OK", "User list"
-
-    def post(self, request):
-        """Create new user."""
-        return "201 CREATED", "User created"
+        """Get user by ID."""
+        user_id = request.path_params["id"]
+        return "200 OK", f"<h1>User {user_id}</h1>"
 
     def put(self, request):
         """Update user."""
-        user_id = request.query_params.get("id")
-        return "200 OK", f"User {user_id} updated"
+        user_id = request.path_params["id"]
+        return "200 OK", f"<p>User {user_id} updated</p>"
 
     def delete(self, request):
         """Delete user."""
         return "204 NO CONTENT", ""
 
-# Register class-based view
-app = Wiverno(routes_list=[
-    ("/users", UserView()),
-])
+class UserListView(BaseView):
+    """Handle user list operations."""
+
+    def get(self, request):
+        """List all users."""
+        return "200 OK", "<ul><li>User 1</li><li>User 2</li></ul>"
+
+    def post(self, request):
+        """Create new user."""
+        return "201 CREATED", "<p>User created</p>"
+
+# Register class-based views
+app = Wiverno()
+app.route("/users")(UserListView())
+app.route("/users/{id:int}")(UserView())
 ```
 
 ## Error Handling
@@ -318,18 +430,26 @@ def users(request):
 Provide custom error pages:
 
 ```python
-def custom_404(request):
-    """Custom 404 handler."""
-    return "404 NOT FOUND", "<h1>Page Not Found</h1>"
+class Custom404:
+    def __call__(self, request):
+        """Custom 404 handler."""
+        return "404 NOT FOUND", "<h1>Page Not Found</h1>"
 
-def custom_405(request):
-    """Custom 405 handler."""
-    return "405 METHOD NOT ALLOWED", "<h1>Method Not Allowed</h1>"
+class Custom405:
+    def __call__(self, request):
+        """Custom 405 handler."""
+        method = request.method
+        return "405 METHOD NOT ALLOWED", f"<h1>Method {method} Not Allowed</h1>"
+
+class Custom500:
+    def __call__(self, request, error_traceback=None):
+        """Custom 500 handler."""
+        return "500 INTERNAL SERVER ERROR", "<h1>Server Error</h1>"
 
 app = Wiverno(
-    routes_list=routes,
-    page_404=custom_404,
-    page_405=custom_405,
+    page_404=Custom404(),
+    page_405=Custom405(),
+    page_500=Custom500()
 )
 ```
 
@@ -366,14 +486,14 @@ app.include_router(posts_router, prefix="/posts")
 
 ```python
 # Good
-@app.get("/users/posts")
+@app.get("/users/{user_id:int}/posts/{post_id:int}")
 def get_user_post(request):
-    user_id = request.query_params.get("user_id")
-    post_id = request.query_params.get("post_id")
-    pass
+    user_id = request.path_params["user_id"]
+    post_id = request.path_params["post_id"]
+    return "200 OK", f"<h1>User {user_id}, Post {post_id}</h1>"
 
 # Bad
-@app.get("/users/posts")
+@app.get("/users/{user_id:int}/posts/{post_id:int}")
 def handler(request):
     pass
 ```
@@ -382,11 +502,18 @@ def handler(request):
 
 ```python
 # Resources: /users
-@app.get("/users")          # List all users
-@app.post("/users")         # Create user
-@app.get("/users/detail")   # Get single user (use query param for id)
-@app.put("/users/detail")   # Update user (use query param for id)
-@app.delete("/users/detail")# Delete user (use query param for id)
+@app.get("/users")               # List all users
+@app.post("/users")              # Create user
+@app.get("/users/{id:int}")      # Get single user
+@app.put("/users/{id:int}")      # Update user
+@app.delete("/users/{id:int}")   # Delete user
+
+# Nested resources: /users/{user_id}/posts
+@app.get("/users/{user_id:int}/posts")              # List user's posts
+@app.post("/users/{user_id:int}/posts")             # Create post for user
+@app.get("/users/{user_id:int}/posts/{post_id:int}")# Get specific post
+@app.put("/users/{user_id:int}/posts/{post_id:int}")# Update post
+@app.delete("/users/{user_id:int}/posts/{post_id:int}")# Delete post
 ```
 
 ### 4. Version Your API

@@ -16,19 +16,23 @@ Welcome to Wiverno development documentation!
 ## Main Sections
 
 **Getting Started**
+
 - [Contributing](contributing.md) - How to contribute
 - [Setup](setup.md) - Development environment
 
 **Code Quality**
+
 - [Code Style](code-style.md) - Naming, organization, docstrings
 - [Type Hints](type-hints.md) - Type annotation rules
 - [Linting](linting.md) - Ruff, MyPy, pre-commit
 
 **Testing & Performance**
+
 - [Testing](testing.md) - Running tests, fixtures, examples
 - [Benchmarks](benchmarks.md) - Performance testing, profiling, optimization
 
 **Understanding Wiverno**
+
 - [Architecture](architecture.md) - How Wiverno works
 - [Project Structure](project-structure.md) - File organization
 - [Workflow](workflow.md) - Development process
@@ -42,7 +46,7 @@ make lint              # Check code quality
 make typecheck         # Type check
 make check             # All checks
 make docs-serve        # Serve documentation
-wiverno run dev app:app  # Dev server with auto-reload
+wiverno run dev  # Dev server with auto-reload
 ```
 
 ## Requirements

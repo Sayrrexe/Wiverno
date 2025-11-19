@@ -31,58 +31,7 @@ def index(request):
     return "200 OK", "Hello, World!"
 ```
 
-Or with route list (alternative approach):
-
-```python
-from wiverno.main import Wiverno
-
-def index(request):
-    return "200 OK", "Hello, World!"
-
-app = Wiverno(routes_list=[
-    ("/", index),
-])
-```
-
 ## Constructor Parameters
-
-### routes_list
-
-**Type:** `list[tuple[str, Callable | type]] | None`
-**Default:** `None`
-
-A list of tuples containing URL paths and their handlers. Each tuple consists of:
-
-- **Pattern** (str): URL path (no dynamic parameters supported)
-- **Handler** (Callable | type): Function or class-based view
-
-**Examples:**
-
-```python
-# Function-based views
-routes = [
-    ("/", index_view),
-    ("/about", about_view),
-    ("/users", users_view),
-]
-
-# Class-based views
-from wiverno.views.base_views import BaseView
-
-class UserView(BaseView):
-    def get(self, request):
-        return "200 OK", "User list"
-
-routes = [
-    ("/users", UserView),
-]
-
-# Mixed
-routes = [
-    ("/", index_view),
-    ("/api/users", UserView),
-]
-```
 
 ### debug_mode
 
@@ -192,7 +141,7 @@ Include routes from a `Router` instance with an optional URL prefix.
 **Example:**
 
 ```python
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 
 api_router = Router()
 
@@ -294,9 +243,8 @@ class APIView(BaseView):
     def post(self, request):
         return "201 Created", '{"created": true}'
 
-app = Wiverno(routes_list=[
-    ("/api", APIView),
-])
+app = Wiverno()
+app.route("/api")(APIView())
 ```
 
 ## Error Handling
