@@ -1,6 +1,6 @@
 [project]
 name = "wiverno"
-version = "0.1.3"
+version = "1.0.0"
 description = "A lightweight WSGI framework for building fast and flexible Python web applications"
 readme = "README.md"
 license = "MIT"
