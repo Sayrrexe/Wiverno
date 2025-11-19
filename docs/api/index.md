@@ -48,7 +48,7 @@ from wiverno.core.server import RunServer
 from wiverno.core.requests import Request
 
 # Routing
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 
 # Templates
 from wiverno.templating.templator import Templator
@@ -86,9 +86,8 @@ def my_view(request: Request) -> tuple[str, str]:
     """Type-annotated view function."""
     return "200 OK", "Hello!"
 
-app: Wiverno = Wiverno(routes_list=[
-    ("/", my_view),
-])
+app: Wiverno = Wiverno()
+app.get("/")(my_view)
 ```
 
 ## Documentation Conventions

@@ -37,10 +37,15 @@ Wiverno aims to be easy to learn and use. The API is intentionally small and foc
 
 ```python
 # Simple routing
-app = Wiverno(routes_list=[
-    ("/", index),
-    ("/about", about),
-])
+app = Wiverno()
+
+@app.get("/")
+def index(request):
+    return "200 OK", "Hello, World!"
+
+@app.get("/about")
+def about(request):
+    return "200 OK", "About"
 ```
 
 ### Explicit Over Implicit

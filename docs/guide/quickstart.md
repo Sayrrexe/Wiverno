@@ -12,7 +12,7 @@ Let's create a simple "Hello, World!" application.
 
 ### Step 1: Create a Python File
 
-Create a new file called `app.py`:
+Create a new file called `run.py`:
 
 ```python
 from wiverno import Wiverno
@@ -30,7 +30,7 @@ def index(request):
 Use the Wiverno CLI to start the development server:
 
 ```bash
-wiverno run dev app:app
+wiverno run dev
 ```
 
 You should see output like:
@@ -75,7 +75,7 @@ def user_detail(request):
 Run with:
 
 ```bash
-wiverno run dev app:app
+wiverno run dev
 ```
 
 Now you can visit:
@@ -252,12 +252,6 @@ def headers_info(request):
 **Always use the Wiverno CLI for development** - it provides auto-reload:
 
 ```bash
-wiverno run dev --app-module app --app-name app
-```
-
-Or with default module name:
-
-```bash
 wiverno run dev
 ```
 
@@ -269,8 +263,19 @@ You can configure the server with custom host and port using CLI options:
 
 ```bash
 # Custom host and port
-wiverno run dev --host 0.0.0.0 --port 5000 --app-module myapp --app-name application
+wiverno run dev --host 0.0.0.0 --port 5000 
 ```
+
+And
+
+```bash
+# Custom app and file names
+wiverno run dev --app-module myapp --app-name application
+```
+
+where:
+- `--app-module` — the name of the application module file
+- `--app-name` — the name of the main application variable in Wiverno
 
 For production, use a production WSGI server like gunicorn or waitress (see deployment docs).
 

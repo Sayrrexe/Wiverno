@@ -112,7 +112,7 @@ docs-deploy: ## Deploy documentation to GitHub Pages
 # Development Server
 serve: ## Run development server with auto-reload
 	@echo "$(BLUE)Starting development server...$(NC)"
-	uv run python -c "from wiverno.dev.dev_server import DevServer; from wiverno.main import Wiverno; DevServer(Wiverno(routes_list=[])).start()"
+	uv run python -c "from wiverno.dev.dev_server import DevServer; from wiverno.main import Wiverno; DevServer(Wiverno()).start()"
 
 # Build and Distribution
 build: clean ## Build distribution packages

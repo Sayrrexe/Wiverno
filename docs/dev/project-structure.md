@@ -37,43 +37,43 @@ Wiverno/
 
 Core framework functionality:
 
-| File | Purpose |
-|------|---------|
-| `requests.py` | Request parsing and handling |
-| `router.py` | Route matching and registration |
-| `server.py` | WSGI server wrapper |
+| File                | Purpose                         |
+| ------------------- | ------------------------------- |
+| `requests.py`       | Request parsing and handling    |
+| `routing/router.py` | Route matching and registration |
+| `server.py`         | WSGI server wrapper             |
 
 ### wiverno/templating/
 
 Template rendering:
 
-| File | Purpose |
-|------|---------|
+| File           | Purpose                 |
+| -------------- | ----------------------- |
 | `templator.py` | Jinja2 template wrapper |
 
 ### wiverno/views/
 
 View classes and error handlers:
 
-| File | Purpose |
-|------|---------|
-| `base_views.py` | BaseView class-based views |
+| File              | Purpose                      |
+| ----------------- | ---------------------------- |
+| `base_views.py`   | BaseView class-based views   |
 | `pages_errors.py` | Default 404/405/500 handlers |
 
 ### wiverno/dev/
 
 Development utilities:
 
-| File | Purpose |
-|------|---------|
+| File            | Purpose                    |
+| --------------- | -------------------------- |
 | `dev_server.py` | Dev server with hot reload |
 
 ### Root Level
 
-| File | Purpose |
-|------|---------|
-| `main.py` | Wiverno WSGI application |
-| `cli.py` | CLI interface (Typer-based) |
+| File      | Purpose                     |
+| --------- | --------------------------- |
+| `main.py` | Wiverno WSGI application    |
+| `cli.py`  | CLI interface (Typer-based) |
 
 ### tests/
 
@@ -86,13 +86,13 @@ Test organization:
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `pyproject.toml` | Dependencies, config, tools |
-| `mkdocs.yml` | Documentation configuration |
-| `.pre-commit-config.yaml` | Pre-commit hooks |
-| `Makefile` | Development commands |
-| `README.md` | Project overview |
+| File                      | Purpose                     |
+| ------------------------- | --------------------------- |
+| `pyproject.toml`          | Dependencies, config, tools |
+| `mkdocs.yml`              | Documentation configuration |
+| `.pre-commit-config.yaml` | Pre-commit hooks            |
+| `Makefile`                | Development commands        |
+| `README.md`               | Project overview            |
 
 ## Next Steps
 

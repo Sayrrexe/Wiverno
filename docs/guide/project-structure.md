@@ -8,7 +8,7 @@ For small applications, a simple single-file structure works well:
 
 ```
 myapp/
-├── app.py
+├── run.py
 └── templates/
     └── index.html
 ```
@@ -19,7 +19,7 @@ For production applications, we recommend the following structure:
 
 ```
 myproject/
-├── app.py              # Application entry point
+├── run.py              # Application entry point
 ├── requirements.txt    # Dependencies
 ├── config.py          # Configuration
 ├── .env               # Environment variables
@@ -50,7 +50,7 @@ myproject/
 
 ## File-by-File Breakdown
 
-### app.py
+### run.py
 
 The main entry point of your application:
 
@@ -70,7 +70,7 @@ app.include_router(api_router, prefix="/api")
 Run with:
 
 ```bash
-wiverno run dev app:app
+wiverno run dev
 ```
 
 ### config.py
@@ -102,7 +102,7 @@ View functions organized by feature using Router:
 
 ```python
 """Home page views."""
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 from wiverno.templating.templator import Templator
 
 home_router = Router()
@@ -132,7 +132,7 @@ API endpoints using Router:
 ```python
 """API views."""
 import json
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 
 api_router = Router()
 
@@ -162,7 +162,7 @@ For larger applications, organize views into blueprints using Router:
 ````python
 # views/blog/__init__.py
 """Blog blueprint."""
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 
 blog_router = Router()
 
@@ -225,7 +225,7 @@ PORT=8000
 Load in your application:
 
 ```python
-# app.py
+# run.py
 from dotenv import load_dotenv
 load_dotenv()
 ```
@@ -246,67 +246,6 @@ tests/
     └── test_full_flow.py
 ```
 
-## Best Practices
-
-### 1. Separation of Concerns
-
-Keep different aspects of your application separate:
-
-- **Views**: Handle requests and responses
-- **Models**: Data access and business logic
-- **Templates**: Presentation layer
-- **Config**: Configuration management
-
-### 2. DRY (Don't Repeat Yourself)
-
-Extract common functionality:
-
-```python
-# utils/responses.py
-"""Common response utilities."""
-import json
-
-def json_response(data, status="200 OK"):
-    """Return JSON response."""
-    return status, json.dumps(data)
-
-def error_response(message, status="400 Bad Request"):
-    """Return error response."""
-    return status, json.dumps({"error": message})
-```
-
-### 3. Configuration Management
-
-Use different configs for different environments:
-
-```python
-# config/development.py
-DEBUG = True
-DATABASE_URL = "sqlite:///dev.db"
-
-# config/production.py
-DEBUG = False
-DATABASE_URL = os.getenv("DATABASE_URL")
-```
-
-### 4. Logging
-
-Set up proper logging:
-
-```python
-import logging
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler("app.log"),
-        logging.StreamHandler()
-    ]
-)
-
-logger = logging.getLogger(__name__)
-```
 
 ## Next Steps
 

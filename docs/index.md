@@ -12,7 +12,7 @@
 
 ## Features
 
-- **Simple routing system** - Define routes with decorators or routes_list
+- **Simple routing system** - Define routes with decorators
 - **Request/Response handling** - Clean abstractions for HTTP requests
 - **Template engine integration** - Built-in Jinja2 support via Templator
 - **Class-based views** - BaseView for better code organization
@@ -31,10 +31,10 @@ def index(request):
     return "200 OK", "Hello, World!"
 ```
 
-Save this as `app.py` and run:
+Save this as `run.py` and run:
 
 ```bash
-wiverno run dev --app-module app --app-name app
+wiverno run dev
 ```
 
 Visit [http://localhost:8000](http://localhost:8000) to see your app in action!

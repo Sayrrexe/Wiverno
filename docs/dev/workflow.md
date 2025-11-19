@@ -38,8 +38,8 @@ If any check fails, fix it and commit again.
 ## Development Server
 
 ```bash
-wiverno run dev app:app              # Start server
-wiverno run dev app:app --port 5000  # Custom port
+wiverno run dev              # Start server
+wiverno run dev --port 5000  # Custom port
 ```
 
 Auto-reload on code changes.
@@ -92,6 +92,7 @@ make check
 ```
 
 Runs:
+
 - Format check
 - Linting
 - Type checking

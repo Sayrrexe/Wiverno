@@ -17,16 +17,16 @@ uv run ruff check wiverno/core/  # Check specific folder
 
 ### Rules
 
-| Code | Rule |
-|------|------|
-| E | pycodestyle errors |
-| W | pycodestyle warnings |
-| F | pyflakes (undefined names, etc) |
-| I | isort (import sorting) |
-| B | flake8-bugbear (common bugs) |
-| C4 | flake8-comprehensions |
-| UP | pyupgrade (modern syntax) |
-| S | flake8-bandit (security) |
+| Code | Rule                            |
+| ---- | ------------------------------- |
+| E    | pycodestyle errors              |
+| W    | pycodestyle warnings            |
+| F    | pyflakes (undefined names, etc) |
+| I    | isort (import sorting)          |
+| B    | flake8-bugbear (common bugs)    |
+| C4   | flake8-comprehensions           |
+| UP   | pyupgrade (modern syntax)       |
+| S    | flake8-bandit (security)        |
 
 Configuration: `pyproject.toml` - line-length: 100 characters, Python 3.12 target
 
@@ -38,7 +38,7 @@ Static type checker for strict mode enforcement.
 
 ```bash
 uv run mypy wiverno              # Check all files
-uv run mypy wiverno/core/router.py  # Check specific file
+uv run mypy wiverno/core/routing/router.py  # Check specific file
 uv run mypy --show-error-codes wiverno  # Show error codes
 ```
 
@@ -57,6 +57,7 @@ pre-commit autoupdate           # Update to latest
 ```
 
 Checks:
+
 1. Ruff linting
 2. Ruff formatting
 3. MyPy type checking
@@ -83,7 +84,7 @@ Import sorting (Ruff I):
 from __future__ import annotations
 import os
 from jinja2 import Environment
-from wiverno.core import router
+from wiverno.core.routing import router
 ```
 
 Line length (E501) - max 100 chars:

@@ -107,7 +107,7 @@ Fix type errors:
 
 ```bash
 uv run mypy --show-error-codes wiverno
-uv run mypy wiverno/core/router.py  # Check specific file
+uv run mypy wiverno/core/routing/router.py  # Check specific file
 ```
 
 ## Next Steps

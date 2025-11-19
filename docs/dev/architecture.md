@@ -32,6 +32,7 @@ request.cookies     # Parsed cookies dict
 ```
 
 Auto-parses body based on Content-Type:
+
 - `application/json` - JSON decode
 - `application/x-www-form-urlencoded` - form parsing
 - `multipart/form-data` - file upload parsing
@@ -103,7 +104,7 @@ Methods dispatched by `request.method.lower()`
 Router class for organizing routes:
 
 ```python
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 
 api_router = Router()
 

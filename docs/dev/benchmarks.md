@@ -34,55 +34,52 @@ Test route matching speed:
 ```python
 """Benchmark router performance."""
 import pytest
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 
 
 def test_simple_routing(benchmark):
     """Benchmark simple route matching."""
-    routes = [("/", lambda r: ("200 OK", "test"))]
-    router = Router(routes)
+    router = Router()
+    router.get("/")(lambda r: ("200 OK", "test"))
 
-    result = benchmark(router.match, "/")
-    handler, params = result
+    result = benchmark(router.registry.match, "/", "GET")
+    handler, params, _ = result
     assert handler is not None
 
 
 def test_parameter_extraction(benchmark):
     """Benchmark path parameter extraction."""
-    routes = [("/user/<id>", lambda r: ("200 OK", "test"))]
-    router = Router(routes)
+    router = Router()
+    router.get("/user/{id}")(lambda r: ("200 OK", "test"))
 
-    result = benchmark(router.match, "/user/123")
-    handler, params = result
+    result = benchmark(router.registry.match, "/user/123", "GET")
+    handler, params, _ = result
     assert params["id"] == "123"
 
 
 def test_large_route_table(benchmark):
     """Benchmark with many routes."""
-    routes = [
-        (f"/route{i}", lambda r: ("200 OK", "test"))
-        for i in range(100)
-    ]
-    router = Router(routes)
+    router = Router()
+    for i in range(100):
+        router.get(f"/route{i}")(lambda r: ("200 OK", "test"))
 
-    result = benchmark(router.match, "/route50")
-    handler, params = result
+    result = benchmark(router.registry.match, "/route50", "GET")
+    handler, params, _ = result
     assert handler is not None
 
 
 def test_complex_patterns(benchmark):
     """Benchmark complex route patterns."""
-    routes = [
-        ("/api/v1/users/<user_id>/posts/<post_id>/comments/<comment_id>",
+    router = Router()
+    router.get("/api/v1/users/{user_id}/posts/{post_id}/comments/{comment_id}")(
          lambda r: ("200 OK", "test"))
-    ]
-    router = Router(routes)
 
     result = benchmark(
-        router.match,
-        "/api/v1/users/123/posts/456/comments/789"
+        router.registry.match,
+        "/api/v1/users/123/posts/456/comments/789",
+        "GET"
     )
-    handler, params = result
+    handler, params, _ = result
     assert len(params) == 3
 ```
 
@@ -159,7 +156,8 @@ def test_simple_request_cycle(benchmark):
     def index(request):
         return "200 OK", "Hello, World!"
 
-    app = Wiverno(routes_list=[("/", index)])
+    app = Wiverno()
+    app.get("/")(index)
 
     environ = {
         "REQUEST_METHOD": "GET",
@@ -188,7 +186,8 @@ def test_parameterized_request(benchmark):
         user_id = request.path_params.get("id")
         return "200 OK", f"User {user_id}"
 
-    app = Wiverno(routes_list=[("/user/<id>", user_view)])
+    app = Wiverno()
+    app.get("/user/{id}")(user_view)
 
     environ = {
         "REQUEST_METHOD": "GET",

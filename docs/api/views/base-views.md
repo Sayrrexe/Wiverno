@@ -204,29 +204,12 @@ class UserView(BaseView):
 app.route("/users")(UserView())
 ```
 
-### Using routes_list
-
-Include class-based views in the routes list:
-
-```python
-class ArticleView(BaseView):
-    def get(self, request):
-        return "200 OK", "Articles"
-
-    def post(self, request):
-        return "201 CREATED", "Article created"
-
-app = Wiverno(routes_list=[
-    ("/articles", ArticleView),
-])
-```
-
 ### With Router
 
 Use class-based views with routers:
 
 ```python
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 
 router = Router()
 

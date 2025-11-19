@@ -55,14 +55,14 @@ make lint             # Check code quality
 make typecheck        # Type checking
 make check            # All checks
 make docs-serve       # Serve documentation
-wiverno run dev app:app  # Dev server
+wiverno run dev       # Dev server
 ```
 
 ## Development Server
 
 ```bash
-wiverno run dev app:app
-wiverno run dev app:app --host 0.0.0.0 --port 5000
+wiverno run dev
+wiverno run dev --host 0.0.0.0 --port 5000
 ```
 
 ## Next Steps

@@ -43,15 +43,16 @@ tests/
 
 ```python
 import pytest
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 
 def test_basic_route_matching():
     """Test basic route matching works."""
     def view(request):
         return "200 OK", "test"
 
-    router = Router([("/test", view)])
-    handler, params = router.match("/test")
+    router = Router()
+    router.get("/test")(view)
+    handler, params, _ = router.registry.match("/test", "GET")
 
     assert handler is view
     assert params == {}
@@ -67,7 +68,8 @@ def test_full_request_cycle():
     def index(request):
         return "200 OK", "Hello"
 
-    app = Wiverno(routes_list=[("/", index)])
+    app = Wiverno()
+    app.get("/")(index)
 
     environ = {
         "REQUEST_METHOD": "GET",
@@ -92,12 +94,13 @@ def test_full_request_cycle():
 
 ```python
 import pytest
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 
 def test_router_performance(benchmark):
     """Benchmark router matching speed."""
-    routes = [(f"/route{i}", lambda r: ("200 OK", "")) for i in range(100)]
-    router = Router(routes)
+    router = Router()
+    for i in range(100):
+        router.get(f"/route{i}")(lambda r: ("200 OK", ""))
 
     def match_route():
         return router.match("/route50")
@@ -252,6 +255,7 @@ Print debugging: `uv run pytest -s`
 Using breakpoint: `import pdb; pdb.set_trace()`
 
 Common flags:
+
 - `-x` - Stop on first failure
 - `-v` - Verbose output
 - `-s` - Show print output

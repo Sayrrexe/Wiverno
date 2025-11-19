@@ -49,7 +49,7 @@ wiverno run dev --watch src,lib
 **Example:**
 
 ```bash
-# app.py
+# run.py
 from wiverno.main import Wiverno
 
 app = Wiverno()
@@ -62,7 +62,7 @@ def index(request):
 Run:
 
 ```bash
-wiverno run dev --app-module app
+wiverno run dev
 ```
 
 The server will automatically reload when you modify Python files.

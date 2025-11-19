@@ -1,8 +1,8 @@
 # Router
 
-The `Router` class provides a way to organize and group routes separately from the main `Wiverno` application. Routes defined in a router can be included in a Wiverno application using `include_router()`.
+The `Router` class provides a way to organize and group routes separately from the main `Wiverno` application. Routes defined in a router can be included in the main application using `include_router()`.
 
-## Module: `wiverno.core.router`
+## Module: `wiverno.core.routing.router`
 
 ## Overview
 
@@ -17,7 +17,7 @@ Routes from a router are included in the main application with an optional URL p
 ## Basic Usage
 
 ```python
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 
 # Create a router
 api_router = Router()
@@ -125,6 +125,7 @@ router.add_route("/status", api_status, methods=["GET"])
 Returns all registered routes in the router.
 
 **Returns:** List of route dictionaries with keys:
+
 - `path` (str): Route path
 - `handler` (Callable): Handler function
 - `methods` (list[str] | None): Allowed HTTP methods
@@ -149,7 +150,7 @@ Use `app.include_router()` to add router routes to your Wiverno application.
 
 ```python
 from wiverno.main import Wiverno
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 
 # Create routers
 api_router = Router()
@@ -213,7 +214,7 @@ def get_users(request):
 ### API Router
 
 ```python
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 from wiverno.core.requests import Request
 
 api_router = Router()
@@ -236,7 +237,7 @@ def get_post(request: Request):
 ### Nested Router Prefixes
 
 ```python
-from wiverno.core.router import Router
+from wiverno.core.routing.router import Router
 from wiverno.main import Wiverno
 
 # V1 API routes
