@@ -1,0 +1,78 @@
+# Pre-commit hooks configuration for Wiverno
+# See https://pre-commit.com for more information
+
+repos:
+  # Ruff - Fast Python linter and formatter
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      # Run the linter on main code only
+      - id: ruff
+        name: ruff (linter)
+        args: [--fix]
+        types_or: [python, pyi]
+        files: ^wiverno/
+      # Run the formatter on all Python files
+      - id: ruff-format
+        name: ruff (formatter)
+        types_or: [python, pyi]
+
+  # Mypy - Static type checker (only for main code, not tests)
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        name: mypy (type checker)
+        args: [--ignore-missing-imports, --strict]
+        additional_dependencies: []
+        types_or: [python, pyi]
+        files: ^wiverno/
+        exclude: ^tests/
+
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # Remove trailing whitespace
+      - id: trailing-whitespace
+        name: trim trailing whitespace
+        args: [--markdown-linebreak-ext=md]
+      # Ensure files end with a newline
+      - id: end-of-file-fixer
+        name: fix end of files
+      # Validate YAML files
+      - id: check-yaml
+        name: check yaml syntax
+        args: [--unsafe]
+      # Validate TOML files
+      - id: check-toml
+        name: check toml syntax
+      # Check for files that would conflict in case-insensitive filesystems
+      - id: check-case-conflict
+        name: check for case conflicts
+      # Check for merge conflicts
+      - id: check-merge-conflict
+        name: check for merge conflicts
+      # Prevent large files from being committed
+      - id: check-added-large-files
+        name: check for large files
+        args: [--maxkb=500]
+
+# Global configuration
+default_language_version:
+  python: python3
+
+# Fail fast - stop on first failure
+fail_fast: false
+
+# Files to exclude from all hooks
+exclude: |
+  (?x)^(
+      __pycache__/.*|
+      .*\.pyc$|
+      .*\.pyo$|
+      .*\.egg-info/.*|
+      .*/htmlcov/.*|
+      .*/site/.*|
+      .*/\.pytest_cache/.*
+  )$

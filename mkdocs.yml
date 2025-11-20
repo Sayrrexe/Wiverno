@@ -1,0 +1,202 @@
+site_name: Wiverno Documentation
+site_description: A lightweight WSGI framework for building fast and flexible Python web applications
+site_author: Sayrrexe
+site_url: https://github.com/Sayrrexe/Wiverno
+
+repo_name: Sayrrexe/Wiverno
+repo_url: https://github.com/Sayrrexe/Wiverno
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2024 Sayrrexe
+
+theme:
+  name: material
+  language: en
+  palette:
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+  features:
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - search.share
+    - header.autohide
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+plugins:
+  - search:
+      lang: en
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+  - mkdocstrings:
+      enabled: true
+      default_handler: python
+      handlers:
+        python:
+          paths: [.]
+          options:
+            docstring_style: google
+            docstring_options:
+              ignore_init_summary: false
+            merge_init_into_class: true
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_root_members_full_path: false
+            show_object_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            show_signature: true
+            show_signature_annotations: true
+            separate_signature: true
+            signature_crossrefs: true
+            members_order: source
+            group_by_category: true
+            show_category_heading: true
+            show_if_no_docstring: false
+            inherited_members: false
+            filters:
+              - "!^_"
+              - "^__init__$"
+            heading_level: 2
+
+markdown_extensions:
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      use_pygments: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Sayrrexe
+  version:
+    provider: mike
+
+nav:
+  - Home:
+      - index.md
+      - Quickstart: guide/quickstart.md
+      - Installation: guide/installation.md
+
+  - Guide:
+      - guide/index.md
+      - Getting Started:
+          - guide/installation.md
+          - guide/quickstart.md
+          - guide/project-structure.md
+      - Core Concepts:
+          - guide/routing.md
+          - guide/requests.md
+          - guide/cli.md
+
+  - API Reference:
+      - api/index.md
+      - Core:
+          - Application: api/core/application.md
+          - Requests: api/core/requests.md
+          - Router: api/core/router.md
+          - Server: api/core/server.md
+      - Templating:
+          - Templator: api/templating/templator.md
+      - Views:
+          - Base Views: api/views/base-views.md
+      - CLI:
+          - api/cli.md
+
+  - Development:
+      - dev/index.md
+      - Getting Started:
+          - dev/setup.md
+      - Code Quality:
+          - dev/code-style.md
+          - dev/type-hints.md
+      - Testing:
+          - dev/testing.md
+          - dev/benchmarks.md
+      - Development Process:
+          - dev/workflow.md
+          - dev/project-structure.md
+          - dev/architecture.md
+      - Community:
+          - dev/contributing.md

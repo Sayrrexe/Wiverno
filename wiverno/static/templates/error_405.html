@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>405 Method Not Allowed</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: #121212;
+        color: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+      }
+      .card {
+        background: #1f1f1f;
+        border-radius: 12px;
+        padding: 2rem 3rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        max-width: 800px;
+        width: 100%;
+      }
+      h1 {
+        color: #eab308;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+      p {
+        color: #d1d5db;
+      }
+      .method-info {
+        margin-top: 1rem;
+        background: #2e2e2e;
+        border-left: 4px solid #facc15;
+        padding: 1rem;
+        border-radius: 8px;
+        font-family: monospace;
+        font-size: 0.95rem;
+        color: #fefce8;
+        white-space: pre-wrap;
+      }
+      .footer {
+        margin-top: 2rem;
+        text-align: center;
+        font-size: 0.8rem;
+        color: #6b7280;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>405 METHOD NOT ALLOWED</h1>
+      <p>The method you used is not allowed for this endpoint.</p>
+
+      <div class="method-info">Method: {{ method }}</div>
+
+      <div class="footer">© Wiverno Framework</div>
+    </div>
+  </body>
+</html>
