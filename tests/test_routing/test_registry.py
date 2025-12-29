@@ -12,7 +12,8 @@ Tests:
 
 import pytest
 
-from wiverno.core.routing.registry import RouteConflictError, RouterRegistry
+from wiverno.core.routing.registry import RouterRegistry
+from wiverno.core.exceptions import RouteConflictError
 
 # ============================================================================
 # Registration Tests

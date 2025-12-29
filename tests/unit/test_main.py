@@ -39,7 +39,7 @@ class TestPageNotFound404:
 
         status, body = handler(request)
 
-        assert status == "404 NOT FOUND"
+        assert status == 404
         assert isinstance(body, str)
         assert len(body) > 0
 
@@ -65,7 +65,7 @@ class TestMethodNotAllowed405:
 
         status, body = handler(request)
 
-        assert status == "405 METHOD NOT ALLOWED"
+        assert status == 405
         assert isinstance(body, str)
         assert len(body) > 0
 
@@ -91,7 +91,7 @@ class TestInternalServerError500:
 
         status, body = handler(request)
 
-        assert status == "500 INTERNAL SERVER ERROR"
+        assert status == 500
         assert isinstance(body, str)
 
     def test_500_handler_with_traceback(self, basic_environ):
@@ -115,7 +115,7 @@ class TestInternalServerError500:
 
         status, body = handler(request, error_traceback=None)
 
-        assert status == "500 INTERNAL SERVER ERROR"
+        assert status == 500
         assert isinstance(body, str)
 
 
