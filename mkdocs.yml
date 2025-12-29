@@ -168,6 +168,7 @@ nav:
       - Core Concepts:
           - guide/routing.md
           - guide/requests.md
+          - HTTP Status Codes: guide/status-codes.md
           - guide/cli.md
 
   - API Reference:

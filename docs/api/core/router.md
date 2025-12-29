@@ -25,11 +25,11 @@ api_router = Router()
 # Define routes
 @api_router.get("/users")
 def list_users(request):
-    return "200 OK", "Users list"
+    return "Users list"
 
 @api_router.post("/users")
 def create_user(request):
-    return "201 CREATED", "User created"
+    return 201, "User created"
 
 # Include in main app
 from wiverno.main import Wiverno
@@ -68,7 +68,7 @@ Generic route decorator for specifying custom HTTP methods.
 ```python
 @router.route("/data", methods=["GET", "POST"])
 def handle_data(request):
-    return "200 OK", "Data"
+    return "Data"
 ```
 
 #### `@router.get(path)`, `@router.post(path)`, `@router.put(path)`, `@router.patch(path)`, `@router.delete(path)`
@@ -78,19 +78,19 @@ HTTP method-specific decorators.
 ```python
 @router.get("/items")
 def list_items(request):
-    return "200 OK", "Items"
+    return "Items"
 
 @router.post("/items")
 def create_item(request):
-    return "201 CREATED", "Item created"
+    return 201, "Item created"
 
 @router.put("/items/1")
 def update_item(request):
-    return "200 OK", "Item updated"
+    return "Item updated"
 
 @router.delete("/items/1")
 def delete_item(request):
-    return "204 NO CONTENT", ""
+    return 204, ""
 ```
 
 #### `@router.connect(path)`, `@router.head(path)`, `@router.options(path)`, `@router.trace(path)`
@@ -113,7 +113,7 @@ Programmatically add a route to the router without using decorators.
 
 ```python
 def api_status(request):
-    return "200 OK", '{"status": "ok"}'
+    return '{"status": "ok"}'
 
 router.add_route("/status", api_status, methods=["GET"])
 ```
@@ -135,7 +135,7 @@ router = Router()
 
 @router.get("/data")
 def get_data(request):
-    return "200 OK", "Data"
+    return "Data"
 
 routes = router.get_routes()
 print(routes)
@@ -159,11 +159,11 @@ admin_router = Router()
 # Define routes in routers
 @api_router.get("/users")
 def api_users(request):
-    return "200 OK", "API Users"
+    return "API Users"
 
 @admin_router.get("/dashboard")
 def admin_dashboard(request):
-    return "200 OK", "Admin Dashboard"
+    return "Admin Dashboard"
 
 # Create main app and include routers
 app = Wiverno()
@@ -196,7 +196,7 @@ If no methods are specified in the router, no method restriction is applied when
 ```python
 @router.route("/data")  # No methods specified
 def handle_data(request):
-    return "200 OK", "Data"
+    return "Data"
 
 # This route accepts ALL HTTP methods
 ```
@@ -206,7 +206,7 @@ If methods are specified in the router, they are preserved when included in the 
 ```python
 @router.get("/users")  # Only GET allowed
 def get_users(request):
-    return "200 OK", "Users"
+    return "Users"
 ```
 
 ## Examples
@@ -221,17 +221,17 @@ api_router = Router()
 
 @api_router.get("/posts")
 def list_posts(request: Request):
-    return "200 OK", '[{"id": 1, "title": "First"}]'
+    return '[{"id": 1, "title": "First"}]'
 
 @api_router.post("/posts")
 def create_post(request: Request):
     data = request.data
     title = data.get('title')
-    return "201 CREATED", f'{{"title": "{title}"}}'
+    return 201, f'{{"title": "{title}"}}'
 
 @api_router.get("/posts/1")
 def get_post(request: Request):
-    return "200 OK", '{"id": 1, "title": "First"}'
+    return '{"id": 1, "title": "First"}'
 ```
 
 ### Nested Router Prefixes
@@ -245,14 +245,14 @@ v1_router = Router()
 
 @v1_router.get("/users")
 def v1_users(request):
-    return "200 OK", "V1 Users"
+    return "V1 Users"
 
 # V2 API routes
 v2_router = Router()
 
 @v2_router.get("/users")
 def v2_users(request):
-    return "200 OK", "V2 Users"
+    return "V2 Users"
 
 # Include with nested prefixes
 app = Wiverno()
@@ -271,15 +271,15 @@ admin_router = Router()
 
 @admin_router.get("/users")
 def admin_users(request):
-    return "200 OK", "Admin User List"
+    return "Admin User List"
 
 @admin_router.post("/users")
 def admin_create_user(request):
-    return "201 CREATED", "User created"
+    return 201, "User created"
 
 @admin_router.get("/settings")
 def admin_settings(request):
-    return "200 OK", "Admin Settings"
+    return "Admin Settings"
 
 # Include with /admin prefix
 app.include_router(admin_router, prefix="/admin")

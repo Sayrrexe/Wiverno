@@ -36,7 +36,7 @@ class TestBaseViewBasic:
 
         status, body = view(request)
 
-        assert "405" in status
+        assert status == 405
 
     def test_base_view_get_method(self, basic_environ):
         """Test: BaseView with get() method handles GET requests."""
@@ -202,7 +202,7 @@ class TestBaseViewMethodDispatching:
         basic_environ["REQUEST_METHOD"] = "DELETE"
         request = Request(basic_environ)
         status, body = view(request)
-        assert "405" in status
+        assert status == 405
 
 
 # ============================================================================
@@ -229,7 +229,7 @@ class TestBaseView405Handling:
 
         status, body = view(request)
 
-        assert "405" in status
+        assert status == 405
 
     def test_base_view_405_uses_handler(self, basic_environ):
         """Test: 405 response uses MethodNotAllowed405 handler."""
@@ -240,7 +240,7 @@ class TestBaseView405Handling:
 
         status, body = view(request)
 
-        assert "405" in status
+        assert status == 405
         assert isinstance(body, str)
 
     def test_base_view_405_includes_method_info(self, basic_environ):
@@ -257,7 +257,7 @@ class TestBaseView405Handling:
         status, body = view(request)
 
         # Should mention the method or show 405 error
-        assert "405" in status or "DELETE" in body
+        assert status == 405 or "DELETE" in body
 
 
 # ============================================================================
