@@ -4,14 +4,14 @@ Code standards for Wiverno development.
 
 ## Naming Conventions
 
-| Item | Convention | Example |
-|------|-----------|---------|
-| Module/File | snake_case | `request_parser.py` |
-| Class | PascalCase | `RequestParser` |
-| Function/Method | snake_case | `parse_request()` |
-| Constant | UPPER_SNAKE_CASE | `MAX_SIZE = 1000` |
-| Private | _leading_underscore | `_internal_method()` |
-| Magic | __double_underscore | `__init__()` |
+| Item            | Convention            | Example              |
+| --------------- | --------------------- | -------------------- |
+| Module/File     | snake_case            | `request_parser.py`  |
+| Class           | PascalCase            | `RequestParser`      |
+| Function/Method | snake_case            | `parse_request()`    |
+| Constant        | UPPER_SNAKE_CASE      | `MAX_SIZE = 1000`    |
+| Private         | \_leading_underscore  | `_internal_method()` |
+| Magic           | \_\_double_underscore | `__init__()`         |
 
 ## Type Hints
 
@@ -40,12 +40,12 @@ from wiverno.core.requests import Request
 from wiverno.main import Wiverno
 
 def handler(request: Request) -> tuple[str, str]:
-    return "200 OK", "response"
+    return "response"
 
 def app_setup(app: Wiverno) -> None:
     @app.get("/")
     def index(request: Request) -> tuple[str, str]:
-        return "200 OK", "Home"
+        return "Home"
 ```
 
 ## Docstrings
@@ -63,7 +63,7 @@ def process_request(request: Request, timeout: int = 30) -> tuple[str, str]:
     Returns:
         Tuple of (status_code, response_body).
     """
-    return "200 OK", "processed"
+    return "processed"
 ```
 
 ## Import Organization

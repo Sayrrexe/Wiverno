@@ -16,7 +16,7 @@ from wiverno.core.requests import Request
 def my_view(request: Request) -> tuple[str, str]:
     """View function with request parameter."""
     # Access request data here
-    return "200 OK", "Response"
+    return "Response"
 ```
 
 ## Request Attributes
@@ -29,9 +29,9 @@ def handle_request(request):
     method = request.method  # "GET", "POST", "PUT", etc.
 
     if request.method == "GET":
-        return "200 OK", "GET request"
+        return "GET request"
     elif request.method == "POST":
-        return "201 CREATED", "POST request"
+        return 201, "POST request"
 ```
 
 ### Path Information
@@ -40,7 +40,7 @@ def handle_request(request):
 def show_path(request):
     """Display request path."""
     path = request.path  # e.g., "/users/123"
-    return "200 OK", f"<p>Path: {path}</p>"
+    return f"<p>Path: {path}</p>"
 ```
 
 ### Path Parameters
@@ -52,23 +52,24 @@ Extract parameters from dynamic URL segments:
 def get_user(request):
     """Get user by ID from path parameter."""
     user_id = request.path_params["id"]  # Already converted to int
-    return "200 OK", f"<h1>User ID: {user_id}</h1>"
+    return f"<h1>User ID: {user_id}</h1>"
 
 @app.get("/posts/{slug}/comments/{comment_id:int}")
 def get_comment(request):
     """Get comment with multiple path parameters."""
     slug = request.path_params["slug"]           # str
     comment_id = request.path_params["comment_id"]  # int
-    return "200 OK", f"<p>Post: {slug}, Comment: {comment_id}</p>"
+    return f"<p>Post: {slug}, Comment: {comment_id}</p>"
 
 @app.get("/files/{filepath:path}")
 def serve_file(request):
     """Path parameter can contain slashes."""
     filepath = request.path_params["filepath"]  # e.g., "docs/guide/intro.md"
-    return "200 OK", f"<p>File: {filepath}</p>"
+    return f"<p>File: {filepath}</p>"
 ```
 
 **Supported types:**
+
 - `{name}` or `{name:str}` - String (default)
 - `{name:int}` - Integer (automatically converted)
 - `{name:float}` - Float (automatically converted)
@@ -87,7 +88,7 @@ def search(request):
     page = request.query_params.get("page", "1")      # "2"
     limit = request.query_params.get("limit", "10")   # "10"
 
-    return "200 OK", f"<p>Search: {query}, Page: {page}</p>"
+    return f"<p>Search: {query}, Page: {page}</p>"
 ```
 
 **QueryDict** supports both single and multiple values:
@@ -107,7 +108,7 @@ def search_with_tags(request):
     # Get with default if not present
     categories = request.query_params.getlist("category", ["general"])  # ["general"]
 
-    return "200 OK", f"<p>Query: {query}, Tags: {', '.join(tags)}</p>"
+    return f"<p>Query: {query}, Tags: {', '.join(tags)}</p>"
 ```
 
 ### POST Data
@@ -121,7 +122,7 @@ def handle_form(request):
         # Access POST data
         username = request.data.get("username", "")
         email = request.data.get("email", "")
-        return "200 OK", f"User: {username}, Email: {email}"
+        return f"User: {username}, Email: {email}"
     """
 ```
 
@@ -140,7 +141,7 @@ def api_create(request):
         name = data.get("name")
         age = data.get("age")
 
-        return "201 CREATED", f'{{"name": "{name}", "age": {age}}}'
+        return 201, f'{{"name": "{name}", "age": {age}}}'
 ```
 
 ### Headers
@@ -156,15 +157,15 @@ def show_headers(request):
     content_type = headers.get("Content-Type", "")
     accept = headers.get("Accept", "")
 
-    return "200 OK", f"User-Agent: {user_agent}"
+    return f"User-Agent: {user_agent}"
 
 # Check for specific headers
 def check_auth(request):
     """Check authorization header."""
     auth = request.headers.get("Authorization", "")
     if not auth:
-        return "401 UNAUTHORIZED", "Missing auth"
-    return "200 OK", "Authorized"
+        return 401, "Missing auth"
+    return "Authorized"
 ```
 
 ### Cookies
@@ -179,7 +180,7 @@ def show_cookies(request):
     session_id = cookies.get("session_id", "")
     user_pref = cookies.get("preference", "default")
 
-    return "200 OK", f"Session: {session_id}"
+    return f"Session: {session_id}"
 ```
 
 ### Raw WSGI Environ
@@ -196,7 +197,7 @@ def debug_info(request):
     server_port = environ.get("SERVER_PORT")
     scheme = environ.get("wsgi.url_scheme")
 
-    return "200 OK", f"Server: {server_name}:{server_port}"
+    return f"Server: {server_name}:{server_port}"
 ```
 
 ## Request Body
@@ -219,9 +220,9 @@ def handle_raw_body(request):
         # Process raw bytes
         # raw_body is bytes
 
-        return "200 OK", "Body processed"
+        return "Body processed"
 
-    return "400 BAD REQUEST", "No body"
+    return 400, "No body"
 ```
 
 ### Multipart Form Data
@@ -241,9 +242,9 @@ def upload_file(request):
         # Save file or process content
         # file_content is the file data
 
-        return "200 OK", f"Uploaded: {filename}"
+        return f"Uploaded: {filename}"
 
-    return "200 OK", """
+    return """
         <form method="post" enctype="multipart/form-data">
             <input type="file" name="file">
             <button type="submit">Upload</button>
@@ -265,7 +266,7 @@ def handle_form(request):
     # Content-Type: application/x-www-form-urlencoded
     username = request.data.get("username")
     password = request.data.get("password")
-    return "200 OK", "Form received"
+    return "Form received"
 ```
 
 ### application/json
@@ -278,7 +279,7 @@ def api_endpoint(request):
     # Content-Type: application/json
     data = request.data
     # data is already a dict
-    return "200 OK", "JSON received"
+    return "JSON received"
 ```
 
 ### multipart/form-data
@@ -291,7 +292,7 @@ def upload(request):
     # Content-Type: multipart/form-data; boundary=...
     file_data = request.data.get("file")
     description = request.data.get("description")
-    return "200 OK", "Upload received"
+    return "Upload received"
 ```
 
 ## Request Parsing Utilities
@@ -347,15 +348,15 @@ headers = HeaderParser.get_headers(environ)
 def resource(request):
     """Handle different HTTP methods."""
     if request.method == "GET":
-        return "200 OK", "Get resource"
+        return "Get resource"
     elif request.method == "POST":
-        return "201 CREATED", "Created resource"
+        return 201, "Created resource"
     elif request.method == "PUT":
-        return "200 OK", "Updated resource"
+        return "Updated resource"
     elif request.method == "DELETE":
-        return "204 NO CONTENT", ""
+        return 204, ""
     else:
-        return "405 METHOD NOT ALLOWED", ""
+        return 405, ""
 ```
 
 ### Validate Input
@@ -364,7 +365,7 @@ def resource(request):
 def create_user(request):
     """Create user with validation."""
     if request.method != "POST":
-        return "405 METHOD NOT ALLOWED", ""
+        return 405, ""
 
     # Get data
     username = request.data.get("username", "").strip()
@@ -372,14 +373,14 @@ def create_user(request):
 
     # Validate
     if not username:
-        return "400 BAD REQUEST", "Username required"
+        return 400, "Username required"
     if not email:
-        return "400 BAD REQUEST", "Email required"
+        return 400, "Email required"
     if "@" not in email:
-        return "400 BAD REQUEST", "Invalid email"
+        return 400, "Invalid email"
 
     # Process
-    return "201 CREATED", f"User {username} created"
+    return 201, f"User {username} created"
 ```
 
 ### Parse Pagination
@@ -400,7 +401,7 @@ def list_items(request):
     # Calculate offset
     offset = (page - 1) * limit
 
-    return "200 OK", f"Page {page}, Limit {limit}, Offset {offset}"
+    return f"Page {page}, Limit {limit}, Offset {offset}"
 ```
 
 ### Handle API Authentication
@@ -411,13 +412,13 @@ def protected_endpoint(request):
     api_key = request.headers.get("X-API-Key", "")
 
     if not api_key:
-        return "401 UNAUTHORIZED", '{"error": "API key required"}'
+        return 401, '{"error": "API key required"}'
 
     if api_key != "secret-key":
-        return "403 FORBIDDEN", '{"error": "Invalid API key"}'
+        return 403, '{"error": "Invalid API key"}'
 
     # Authorized
-    return "200 OK", '{"data": "protected data"}'
+    return '{"data": "protected data"}'
 ```
 
 ## Best Practices
@@ -431,12 +432,12 @@ def safe_handler(request):
 
     # Validate
     if not value:
-        return "400 BAD REQUEST", "Value required"
+        return 400, "Value required"
 
     # Sanitize
     value = value.strip()[:100]  # Limit length
 
-    return "200 OK", f"Value: {value}"
+    return f"Value: {value}"
 ```
 
 ### 2. Use Type Conversion Safely
@@ -452,7 +453,7 @@ def get_page(request):
     # Ensure valid range
     page = max(1, min(page, 1000))
 
-    return "200 OK", f"Page {page}"
+    return f"Page {page}"
 ```
 
 ### 3. Handle Missing Data
@@ -470,5 +471,6 @@ def safe_access(request):
 ## Next Steps
 
 - [Routing](routing.md) - Define routes and handlers
+- [HTTP Status Codes](status-codes.md) - Understanding status codes
 - [Class-Based Views](../api/views/base-views.md) - Organize with class-based views
 - [Templates](../api/templating/templator.md) - Render HTML templates

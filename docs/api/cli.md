@@ -46,19 +46,23 @@ wiverno run dev [OPTIONS]
 **Options:**
 
 - `--host, -h TEXT` - Server host address
+
   - Default: `localhost`
   - Example: `--host 0.0.0.0` to listen on all interfaces
 
 - `--port, -p INTEGER` - Server port number
+
   - Default: `8000`
   - Example: `--port 3000` to use port 3000
 
 - `--app-module, -m TEXT` - Module containing the WSGI application
+
   - Default: `run`
   - Example: `--app-module app` to load from `app.py`
   - Example: `--app-module myapp.wsgi` to load from `myapp/wsgi.py`
 
 - `--app-name, -a TEXT` - Name of the application variable in the module
+
   - Default: `app`
   - Example: `--app-name application` to use variable `application`
 
@@ -105,14 +109,17 @@ wiverno run prod [OPTIONS]
 **Options:**
 
 - `--host, -h TEXT` - Server host address
+
   - Default: `localhost`
   - Example: `--host 0.0.0.0`
 
 - `--port, -p INTEGER` - Server port number
+
   - Default: `8000`
   - Example: `--port 8080`
 
 - `--app-module, -m TEXT` - Module containing the WSGI application
+
   - Default: `run`
 
 - `--app-name, -a TEXT` - Name of the application variable in the module
@@ -151,9 +158,11 @@ wiverno docs [OPTIONS]
 **Options:**
 
 - `--host, -h TEXT` - Documentation server host
+
   - Default: `127.0.0.1`
 
 - `--port, -p INTEGER` - Documentation server port
+
   - Default: `8000`
 
 - `--open/--no-open` - Open browser automatically
@@ -198,6 +207,7 @@ wiverno start
 ```
 
 **Status:** Currently a placeholder. Future versions will include:
+
 - Project scaffolding
 - Template generation
 - Configuration wizard
@@ -213,6 +223,7 @@ wiverno help
 ```
 
 Displays:
+
 - Overview of Wiverno
 - List of available commands
 - Usage examples for common tasks
@@ -231,7 +242,7 @@ app = Wiverno()
 
 @app.get("/")
 def home(request):
-    return "200 OK", "Hello, World!"
+    return "Hello, World!"
 ```
 
 2. Start development server:
@@ -255,7 +266,7 @@ app = Wiverno()
 
 @app.get("/")
 def home(request):
-    return "200 OK", "Hello"
+    return "Hello"
 ```
 
 2. Run with custom module path:
@@ -316,6 +327,7 @@ wiverno run dev
 **Error:** `ERROR: Module 'app.py' not found in current directory`
 
 **Solution:**
+
 - Make sure you're in the project root directory
 - Check the module name with `-m` option
 - Use `--app-module` to specify correct path
@@ -325,6 +337,7 @@ wiverno run dev
 **Error:** `ERROR: Application 'app' not found in module 'run'`
 
 **Solution:**
+
 - Ensure your module has the application variable
 - Use `--app-name` to specify the correct variable name
 - Example: `wiverno run dev --app-name application`
@@ -334,11 +347,13 @@ wiverno run dev
 **Error:** `ERROR: MkDocs is not installed`
 
 **Solution:**
+
 ```bash
 pip install mkdocs-material mkdocstrings[python]
 ```
 
 Or install all dev dependencies:
+
 ```bash
 uv pip install -e .[dev]
 ```
@@ -348,6 +363,7 @@ uv pip install -e .[dev]
 **Error:** `Address already in use`
 
 **Solution:**
+
 - Use a different port: `wiverno run dev --port 3000`
 - Kill process using the port
 - Wait and retry
