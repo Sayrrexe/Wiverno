@@ -168,6 +168,7 @@ nav:
       - Core Concepts:
           - guide/routing.md
           - guide/requests.md
+          - guide/running.md
           - HTTP Status Codes: guide/status-codes.md
           - guide/cli.md
 
@@ -178,6 +179,8 @@ nav:
           - Requests: api/core/requests.md
           - Router: api/core/router.md
           - Server: api/core/server.md
+      - Development:
+          - DevServer: api/dev/dev-server.md
       - Templating:
           - Templator: api/templating/templator.md
       - Views:

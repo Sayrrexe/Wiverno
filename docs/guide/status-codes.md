@@ -159,14 +159,14 @@ Wiverno supports all standard HTTP status codes:
 - 410 Gone
 - 411 Length Required
 - 412 Precondition Failed
-- 413 Payload Too Large
-- 414 URI Too Long
+- 413 Content Too Large or Request Entity Too Larg
+- 414 URI Too Long or Request-URI Too Long
 - 415 Unsupported Media Type
-- 416 Range Not Satisfiable
+- 416 Range Not Satisfiable or Requested Range Not Satisfiable
 - 417 Expectation Failed
 - 418 I'm a Teapot
 - 421 Misdirected Request
-- 422 Unprocessable Entity
+- 422 Unprocessable Entity or Unprocessable Content
 - 423 Locked
 - 424 Failed Dependency
 - 425 Too Early

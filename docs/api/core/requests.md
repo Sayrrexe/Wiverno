@@ -113,15 +113,6 @@ if "application/json" in request.content_type:
     pass
 ```
 
-#### `content_length: int`
-
-The size of the request body in bytes. Returns 0 if `Content-Length` header is missing or invalid.
-
-```python
-if request.content_length > 10_000_000:
-    return "413 PAYLOAD TOO LARGE", "Request too large"
-```
-
 ### Connection Information
 
 #### `client_ip: str`
