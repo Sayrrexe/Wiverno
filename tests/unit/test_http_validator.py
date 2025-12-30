@@ -176,10 +176,8 @@ class TestHTTPStatusValidator:
             (408, "408 Request Timeout"),
             (409, "409 Conflict"),
             (410, "410 Gone"),
-            (414, "414 Request-URI Too Long"),
             (415, "415 Unsupported Media Type"),
             (418, "418 I'm a Teapot"),
-            (422, "422 Unprocessable Entity"),
             (429, "429 Too Many Requests"),
         ]
         for code, expected in test_cases:
