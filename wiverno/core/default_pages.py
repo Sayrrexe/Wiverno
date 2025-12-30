@@ -25,7 +25,7 @@ class PageNotFound404:
             tuple[str, str]: A tuple of (status, html_body).
         """
         templator = Templator(folder=TEMPLATE_PATH)
-        return "404 NOT FOUND", templator.render("error_404.html")
+        return 404, templator.render("error_404.html")
 
 
 class MethodNotAllowed405:
@@ -44,7 +44,7 @@ class MethodNotAllowed405:
             tuple[str, str]: A tuple of (status, html_body).
         """
         templator = Templator(folder=TEMPLATE_PATH)
-        return "405 METHOD NOT ALLOWED", templator.render(
+        return 405, templator.render(
             "error_405.html", content={"method": request.method}
         )
 
@@ -66,6 +66,6 @@ class InternalServerError500:
             tuple[str, str]: A tuple of (status, html_body).
         """
         templator = Templator(folder=TEMPLATE_PATH)
-        return "500 INTERNAL SERVER ERROR", templator.render(
+        return 500, templator.render(
             "error_500.html", content={"traceback": error_traceback}
         )

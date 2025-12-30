@@ -114,7 +114,7 @@ def index(request):
     html = templator.render("index.html", {
         "title": "Home"
     })
-    return "200 OK", html
+    return html
 
 @home_router.get("/about")
 def about(request):
@@ -122,7 +122,7 @@ def about(request):
     html = templator.render("about.html", {
         "title": "About"
     })
-    return "200 OK", html
+    return html
 ```
 
 ### views/api.py
@@ -143,14 +143,14 @@ def api_users(request):
         {"id": 1, "name": "Alice"},
         {"id": 2, "name": "Bob"},
     ]
-    return "200 OK", json.dumps(users)
+    return json.dumps(users)
 
 @api_router.get("/users/<id>")
 def api_user_detail(request):
     """Get user by ID."""
     user_id = request.path_params.get("id")
     user = {"id": user_id, "name": "User"}
-    return "200 OK", json.dumps(user)
+    return json.dumps(user)
 ```
 
 ## Scaling Your Application
@@ -169,13 +169,13 @@ blog_router = Router()
 @blog_router.get("/")
 def list_posts(request):
     """List all blog posts."""
-    return "200 OK", "Blog posts"
+    return "Blog posts"
 
 @blog_router.get("/<slug>")
 def post_detail(request):
     """Get single blog post."""
     slug = request.path_params.get("slug")
-    return "200 OK", f"Blog post {slug}"
+    return f"Blog post {slug}"
 
 # In app.py
 from wiverno.main import Wiverno
@@ -245,7 +245,6 @@ tests/
 └── integration/
     └── test_full_flow.py
 ```
-
 
 ## Next Steps
 

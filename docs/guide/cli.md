@@ -56,7 +56,7 @@ app = Wiverno()
 
 @app.get("/")
 def index(request):
-    return "200 OK", "Hello, World!"
+    return "Hello, World!"
 ```
 
 Run:

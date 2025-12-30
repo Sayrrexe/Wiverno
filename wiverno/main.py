@@ -10,6 +10,7 @@ from wiverno.core.routing.base import RouterMixin
 from wiverno.core.routing.registry import RouterRegistry
 from wiverno.core.routing.router import Router
 from wiverno.templating.templator import Templator
+from wiverno.core.http.validator import HTTPStatusValidator
 
 logger = logging.getLogger(__name__)
 
@@ -97,16 +98,28 @@ class Wiverno(RouterMixin):
                 request.path_params = path_params
 
             if handler is None and method_allowed is None:
-                status, body = self.page_404(request)
+                raw_status, body = self.page_404(request)
+                status = HTTPStatusValidator.normalize_status(raw_status)
             elif handler is None and method_allowed is False:
-                status, body = self.page_405(request)
+                raw_status, body = self.page_405(request)
+                status = HTTPStatusValidator.normalize_status(raw_status)
             else:
-                status, body = handler(request)  # type: ignore
+                handler_return = handler(request)  # type: ignore
+                if isinstance(handler_return, tuple):
+                    raw_status, body = handler_return
+                    status = HTTPStatusValidator.normalize_status(raw_status)
+                else:
+                    status = "200 OK"
+                    body = handler_return
 
         except Exception:
             logger.exception("Unhandled exception in view handler")
             error_traceback = traceback.format_exc() if self.debug else None
-            status, body = self.page_500(request, error_traceback)
+            raw_status, body = self.page_500(request, error_traceback)
+            status = HTTPStatusValidator.normalize_status(raw_status)
 
         start_response(status, [("Content-Type", "text/html; charset=utf-8")])
+
         return [body.encode("utf-8")]
+    
+        

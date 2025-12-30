@@ -18,6 +18,8 @@ Learn the fundamental concepts of Wiverno:
 
 - [**Routing**](routing.md) - Define URL patterns and handlers
 - [**Requests**](requests.md) - Handle incoming HTTP requests
+- [**Running Your Application**](running.md) - Development and production servers
+- [**HTTP Status Codes**](status-codes.md) - Working with HTTP status codes
 
 ### Advanced Topics
 
@@ -41,11 +43,11 @@ app = Wiverno()
 
 @app.get("/")
 def index(request):
-    return "200 OK", "Hello, World!"
+    return "Hello, World!"
 
 @app.get("/about")
 def about(request):
-    return "200 OK", "About"
+    return "About"
 ```
 
 ### Explicit Over Implicit
@@ -55,7 +57,7 @@ Wiverno prefers explicit configuration over magic. You always know what's happen
 ```python
 # Explicit status codes and content
 def view(request):
-    return "200 OK", "Hello, World!"
+    return "Hello, World!"
 ```
 
 ### Flexibility
@@ -65,12 +67,12 @@ Wiverno doesn't force you into a specific way of doing things. Use what you need
 ```python
 # Function-based views
 def simple_view(request):
-    return "200 OK", "Simple"
+    return "Simple"
 
 # Or class-based views
 class ComplexView(BaseView):
     def get(self, request):
-        return "200 OK", "Complex"
+        return "Complex"
 ```
 
 ## Next Steps
