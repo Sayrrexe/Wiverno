@@ -239,9 +239,9 @@ server.start()
         self._stop_server_process(show_restart_message=False)
         self._start_server_process()
 
-    def start(self) -> None:
+    def _start(self) -> None:
         """
-        Start the development server with hot reload.
+        Start the development server with hot reload (internal method).
 
         This method starts the server and sets up file watching for automatic
         restarts when Python files are modified.
@@ -289,26 +289,33 @@ server.start()
         self._stop_server_process(show_restart_message=False)
         console.print("[green]>> Server stopped successfully[/green]")
 
+    @staticmethod
+    def serve(
+        app_module: str = "run",
+        app_name: str = "app",
+        host: str = "localhost",
+        port: int = 8000,
+    ) -> None:
+        """
+        Run the development server with hot reload.
 
-def run_dev_server(
-    app_module: str = "run",
-    app_name: str = "app",
-    host: str = "localhost",
-    port: int = 8000,
-) -> None:
-    """
-    Convenience function to run the development server.
+        This is the main entry point for starting the development server.
+        Use this method to quickly start a development server with automatic
+        reloading when source files change.
 
-    Args:
-        app_module: Module path containing the WSGI application.
-        app_name: Name of the application variable in the module.
-        host: Server host address.
-        port: Server port.
-    """
-    dev_server = DevServer(
-        app_module=app_module,
-        app_name=app_name,
-        host=host,
-        port=port,
-    )
-    dev_server.start()
+        Example:
+            >>> DevServer.serve(app_module="myapp", port=8080)
+
+        Args:
+            app_module: Module path containing the WSGI application.
+            app_name: Name of the application variable in the module.
+            host: Server host address.
+            port: Server port.
+        """
+        dev_server = DevServer(
+            app_module=app_module,
+            app_name=app_name,
+            host=host,
+            port=port,
+        )
+        dev_server._start()

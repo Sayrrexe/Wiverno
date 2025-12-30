@@ -27,6 +27,7 @@ class TestRunServerInitialization:
         assert server.application is app
         assert server.host == "localhost"
         assert server.port == 8000
+        assert server.request_queue_size == 5
 
     def test_server_initialization_custom_host_port(self):
         """Test: Custom host and port can be set."""
@@ -70,7 +71,7 @@ class TestRunServerStart:
 
         # Configure mock
         mock_httpd = MagicMock()
-        mock_make_server.return_value.__enter__.return_value = mock_httpd
+        mock_make_server.return_value = mock_httpd
 
         # Interrupt serve_forever so test doesn't hang
         mock_httpd.serve_forever.side_effect = KeyboardInterrupt
@@ -79,7 +80,8 @@ class TestRunServerStart:
         server.start()
 
         # Check that make_server was called with correct parameters
-        mock_make_server.assert_called_once_with("localhost", 8080, app)
+        from wsgiref.simple_server import WSGIServer
+        mock_make_server.assert_called_once_with("localhost", 8080, app, server_class=WSGIServer)
 
     @patch("wiverno.core.server.make_server")
     def test_start_calls_serve_forever(self, mock_make_server):
@@ -89,7 +91,7 @@ class TestRunServerStart:
 
         # Configure mock
         mock_httpd = MagicMock()
-        mock_make_server.return_value.__enter__.return_value = mock_httpd
+        mock_make_server.return_value = mock_httpd
         mock_httpd.serve_forever.side_effect = KeyboardInterrupt
 
         # Start server
@@ -106,7 +108,7 @@ class TestRunServerStart:
 
         # Configure mock to simulate Ctrl+C
         mock_httpd = MagicMock()
-        mock_make_server.return_value.__enter__.return_value = mock_httpd
+        mock_make_server.return_value = mock_httpd
         mock_httpd.serve_forever.side_effect = KeyboardInterrupt
 
         # Start and check that no exception was raised
@@ -124,14 +126,14 @@ class TestRunServerStart:
 
         # Configure mock
         mock_httpd = MagicMock()
-        mock_make_server.return_value.__enter__.return_value = mock_httpd
+        mock_make_server.return_value = mock_httpd
         mock_httpd.serve_forever.side_effect = KeyboardInterrupt
 
         # Start server
         server.start()
 
         # Check logging
-        mock_logger.info.assert_any_call("Serving on http://127.0.0.1:3000 ...")
+        mock_logger.info.assert_any_call("Wiverno server started on http://127.0.0.1:3000")
 
     @patch("wiverno.core.server.make_server")
     @patch("wiverno.core.server.logger")
@@ -142,7 +144,7 @@ class TestRunServerStart:
 
         # Configure mock
         mock_httpd = MagicMock()
-        mock_make_server.return_value.__enter__.return_value = mock_httpd
+        mock_make_server.return_value = mock_httpd
         mock_httpd.serve_forever.side_effect = KeyboardInterrupt
 
         # Start server
@@ -176,14 +178,15 @@ class TestRunServerIntegration:
 
         # Configure mock
         mock_httpd = MagicMock()
-        mock_make_server.return_value.__enter__.return_value = mock_httpd
+        mock_make_server.return_value = mock_httpd
         mock_httpd.serve_forever.side_effect = KeyboardInterrupt
 
         # Start server
         server.start()
 
         # Check that application was passed to make_server
-        mock_make_server.assert_called_once_with("0.0.0.0", 8080, simple_app)
+        from wsgiref.simple_server import WSGIServer
+        mock_make_server.assert_called_once_with("0.0.0.0", 8080, simple_app, server_class=WSGIServer)
 
     @patch("wiverno.core.server.make_server")
     def test_server_with_multiple_instances(self, mock_make_server):
