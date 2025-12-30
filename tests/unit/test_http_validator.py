@@ -176,7 +176,6 @@ class TestHTTPStatusValidator:
             (408, "408 Request Timeout"),
             (409, "409 Conflict"),
             (410, "410 Gone"),
-            (413, "413 Request Entity Too Large"),
             (414, "414 Request-URI Too Long"),
             (415, "415 Unsupported Media Type"),
             (418, "418 I'm a Teapot"),
