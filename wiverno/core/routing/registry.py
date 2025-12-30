@@ -2,19 +2,11 @@ from collections.abc import Callable
 from typing import Any, ClassVar
 
 from wiverno.core.requests import Request
+from wiverno.core.exceptions import RouteConflictError
 from wiverno.core.routing.patterns import PathPattern, compile_path
 
+
 type Handler = Callable[[Request], tuple[str, str]]
-
-
-class RouteConflictError(Exception):
-    """
-    Exception raised when attempting to register a route that conflicts with an existing route.
-
-    A conflict occurs when:
-    - The same path and HTTP method combination is already registered
-    - Overlapping method sets are registered for the same path
-    """
 
 
 class RouterRegistry:

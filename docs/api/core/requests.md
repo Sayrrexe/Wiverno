@@ -13,7 +13,7 @@ def my_view(request: Request) -> tuple[str, str]:
     # Access request properties
     method = request.method  # 'GET', 'POST', etc.
     path = request.path     # '/users'
-    return "200 OK", "Hello"
+    return "Hello"
 ```
 
 ## Properties
@@ -30,9 +30,9 @@ The HTTP method of the request.
 
 ```python
 if request.method == "GET":
-    return "200 OK", "Retrieved"
+    return "Retrieved"
 elif request.method == "POST":
-    return "201 CREATED", "Created"
+    return 201, "Created"
 ```
 
 #### `path: str`
@@ -45,9 +45,9 @@ The normalized URL path of the request. Trailing slashes are removed except for 
 
 ```python
 if request.path == "/":
-    return "200 OK", "Home"
+    return "Home"
 elif request.path == "/about":
-    return "200 OK", "About"
+    return "About"
 ```
 
 ### Request Data
@@ -80,7 +80,7 @@ def create_user(request):
     # For JSON POST: {"name": "John", "email": "john@example.com"}
     name = request.data.get('name')
     email = request.data.get('email')
-    return "201 CREATED", f"Created user {name}"
+    return 201, f"Created user {name}"
 ```
 
 ### Headers and Cookies
@@ -219,6 +219,7 @@ data = ParseBody.get_request_params(environ, raw_bytes)
 ```
 
 Supported content types:
+
 - `multipart/form-data` - File uploads and form data
 - `application/x-www-form-urlencoded` - Form submissions
 - `application/json` - JSON data
@@ -241,7 +242,7 @@ headers = HeaderParser.get_headers(environ)
 ```python
 @app.get("/")
 def home(request: Request) -> tuple[str, str]:
-    return "200 OK", "<html><body>Home</body></html>"
+    return "<html><body>Home</body></html>"
 ```
 
 ### GET with Query Parameters
@@ -250,7 +251,7 @@ def home(request: Request) -> tuple[str, str]:
 @app.get("/search")
 def search(request: Request) -> tuple[str, str]:
     q = request.query_params.get('q', '')
-    return "200 OK", f"<html><body>Search results for: {q}</body></html>"
+    return f"<html><body>Search results for: {q}</body></html>"
 ```
 
 ### POST with JSON Data
@@ -263,9 +264,9 @@ def create_user(request: Request) -> tuple[str, str]:
     email = data.get('email')
 
     if not name or not email:
-        return "400 BAD REQUEST", "Missing required fields"
+        return 400, "Missing required fields"
 
-    return "201 CREATED", f"User {name} created"
+    return 201, f"User {name} created"
 ```
 
 ### POST with Form Data

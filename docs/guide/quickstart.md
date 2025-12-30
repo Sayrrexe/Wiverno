@@ -22,7 +22,7 @@ app = Wiverno()
 @app.get("/")
 def index(request):
     """Homepage view function."""
-    return "200 OK", "Hello, World!"
+    return "Hello, World!"
 ```
 
 ### Step 2: Run the Application
@@ -58,18 +58,18 @@ app = Wiverno()
 @app.get("/")
 def index(request):
     """Homepage view."""
-    return "200 OK", "<h1>Hello, World!</h1>"
+    return "<h1>Hello, World!</h1>"
 
 @app.get("/about")
 def about(request):
     """About page view."""
-    return "200 OK", "<h1>About</h1><p>This is the about page</p>"
+    return "<h1>About</h1><p>This is the about page</p>"
 
 @app.get("/users/{id:int}")
 def user_detail(request):
     """User detail with path parameter."""
     user_id = request.path_params["id"]
-    return "200 OK", f"<h1>User {user_id}</h1>"
+    return f"<h1>User {user_id}</h1>"
 ```
 
 Run with:
@@ -96,19 +96,19 @@ app = Wiverno()
 @app.get("/users")
 def get_users(request):
     """Handle GET requests - list users."""
-    return "200 OK", "<ul><li>User 1</li><li>User 2</li></ul>"
+    return "<ul><li>User 1</li><li>User 2</li></ul>"
 
 @app.post("/users")
 def create_user(request):
     """Handle POST requests - create user."""
     name = request.data.get("name", "")
-    return "201 CREATED", f"<p>User {name} created</p>"
+    return 201, f"<p>User {name} created</p>"
 
 @app.get("/users/{id:int}")
 def get_user(request):
     """Handle GET requests - get user by ID."""
     user_id = request.path_params["id"]
-    return "200 OK", f"<h1>User {user_id}</h1>"
+    return f"<h1>User {user_id}</h1>"
 ```
 
 Or use class-based views for better organization:
@@ -122,24 +122,24 @@ class UserView(BaseView):
 
     def get(self, request):
         user_id = request.path_params["id"]
-        return "200 OK", f"<h1>User {user_id}</h1>"
+        return f"<h1>User {user_id}</h1>"
 
     def put(self, request):
         user_id = request.path_params["id"]
-        return "200 OK", f"<p>User {user_id} updated</p>"
+        return f"<p>User {user_id} updated</p>"
 
     def delete(self, request):
-        return "204 NO CONTENT", ""
+        return 204, ""
 
 class UserListView(BaseView):
     """Handle user list operations."""
 
     def get(self, request):
-        return "200 OK", "<ul><li>User 1</li><li>User 2</li></ul>"
+        return "<ul><li>User 1</li><li>User 2</li></ul>"
 
     def post(self, request):
         name = request.data.get("name", "")
-        return "201 CREATED", f"<p>User {name} created</p>"
+        return 201, f"<p>User {name} created</p>"
 
 app = Wiverno()
 app.route("/users")(UserListView())
@@ -184,7 +184,7 @@ def index(request):
         "heading": "Hello, Wiverno!",
         "message": "This is a template-rendered page."
     })
-    return "200 OK", html
+    return html
 
 app = Wiverno()
 ```
@@ -198,14 +198,14 @@ app = Wiverno()
 def user_detail(request):
     """Get user by ID from URL path."""
     user_id = request.path_params["id"]  # Automatically converted to int
-    return "200 OK", f"<h1>User {user_id}</h1>"
+    return f"<h1>User {user_id}</h1>"
 
 @app.get("/posts/{slug}/comments/{comment_id:int}")
 def post_comment(request):
     """Multiple path parameters."""
     slug = request.path_params["slug"]
     comment_id = request.path_params["comment_id"]
-    return "200 OK", f"<p>Post: {slug}, Comment: {comment_id}</p>"
+    return f"<p>Post: {slug}, Comment: {comment_id}</p>"
 ```
 
 Visit: [http://localhost:8000/users/42](http://localhost:8000/users/42)
@@ -218,7 +218,7 @@ def search(request):
     """Search page with query parameters."""
     query = request.query_params.get("q", "")
     tags = request.query_params.getlist("tag")  # Get multiple values
-    return "200 OK", f"<p>Searching for: {query}, Tags: {', '.join(tags)}</p>"
+    return f"<p>Searching for: {query}, Tags: {', '.join(tags)}</p>"
 ```
 
 Visit: [http://localhost:8000/search?q=python&tag=web&tag=framework](http://localhost:8000/search?q=python&tag=web&tag=framework)
@@ -233,8 +233,8 @@ def submit(request):
         # Access POST data
         name = request.data.get("name", "")
         email = request.data.get("email", "")
-        return "200 OK", f"Received: {name} ({email})"
-    return "200 OK", "Send a POST request"
+        return f"Received: {name} ({email})"
+    return "Send a POST request"
 ```
 
 ### Headers
@@ -244,7 +244,7 @@ def submit(request):
 def headers_info(request):
     """Display request headers."""
     user_agent = request.headers.get("User-Agent", "Unknown")
-    return "200 OK", f"Your user agent: {user_agent}"
+    return f"Your user agent: {user_agent}"
 ```
 
 ## Development Mode with Auto-Reload
@@ -263,7 +263,7 @@ You can configure the server with custom host and port using CLI options:
 
 ```bash
 # Custom host and port
-wiverno run dev --host 0.0.0.0 --port 5000 
+wiverno run dev --host 0.0.0.0 --port 5000
 ```
 
 And
@@ -274,6 +274,7 @@ wiverno run dev --app-module myapp --app-name application
 ```
 
 where:
+
 - `--app-module` — the name of the application module file
 - `--app-name` — the name of the main application variable in Wiverno
 
@@ -285,5 +286,6 @@ Now that you've created your first Wiverno application, explore these topics:
 
 - [**Routing**](routing.md) - Learn more about URL routing
 - [**Requests**](requests.md) - Deep dive into request handling
+- [**HTTP Status Codes**](status-codes.md) - Understanding status codes in Wiverno
 
 Happy coding!

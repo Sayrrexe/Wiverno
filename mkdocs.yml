@@ -169,6 +169,7 @@ nav:
           - guide/routing.md
           - guide/requests.md
           - guide/running.md
+          - HTTP Status Codes: guide/status-codes.md
           - guide/cli.md
 
   - API Reference:
