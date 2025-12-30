@@ -2,110 +2,122 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/api/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/api/cli/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/api/core/application/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/api/core/requests/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/api/core/router/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/api/core/server/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
+    </url>
+    <url>
+         <loc>https://github.com/Sayrrexe/Wiverno/api/dev/dev-server/</loc>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/api/templating/templator/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/api/views/base-views/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/dev/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/dev/architecture/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/dev/benchmarks/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/dev/code-style/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/dev/contributing/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/dev/linting/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/dev/project-structure/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/dev/setup/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/dev/testing/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/dev/type-hints/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/dev/workflow/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/guide/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/guide/cli/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/guide/installation/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/guide/project-structure/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/guide/quickstart/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/guide/requests/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
     </url>
     <url>
          <loc>https://github.com/Sayrrexe/Wiverno/guide/routing/</loc>
-         <lastmod>2025-11-19</lastmod>
+         <lastmod>2025-12-30</lastmod>
+    </url>
+    <url>
+         <loc>https://github.com/Sayrrexe/Wiverno/guide/running/</loc>
+         <lastmod>2025-12-30</lastmod>
+    </url>
+    <url>
+         <loc>https://github.com/Sayrrexe/Wiverno/guide/status-codes/</loc>
+         <lastmod>2025-12-30</lastmod>
     </url>
 </urlset>
