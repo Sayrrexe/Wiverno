@@ -3,7 +3,9 @@ from typing import Any, ClassVar
 
 from wiverno.core.exceptions import RouteConflictError
 from wiverno.core.requests import Request
+from wiverno.core.exceptions import RouteConflictError
 from wiverno.core.routing.patterns import PathPattern, compile_path
+
 
 type Handler = Callable[[Request], tuple[str, str]]
 

@@ -13,6 +13,7 @@ from wiverno.core.routing.base import RouterMixin
 from wiverno.core.routing.registry import RouterRegistry
 from wiverno.core.routing.router import Router
 from wiverno.templating.templator import Templator
+from wiverno.core.http.validator import HTTPStatusValidator
 
 logger = logging.getLogger(__name__)
 
@@ -167,3 +168,5 @@ class Wiverno(RouterMixin):
         start_response(status, [("Content-Type", "text/html; charset=utf-8")])
 
         return [body.encode("utf-8")]
+    
+        
