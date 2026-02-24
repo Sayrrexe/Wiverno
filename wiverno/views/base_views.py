@@ -11,7 +11,10 @@ class BaseView:
     is returned.
     """
 
-    def __call__(self, request: Request) -> tuple[str, str]:
+    def __call__(
+        self,
+        request: Request
+    ) -> tuple[str, str]:
         """
         Dispatches the request to the appropriate HTTP method handler.
 

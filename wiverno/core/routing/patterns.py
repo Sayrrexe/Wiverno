@@ -28,7 +28,10 @@ class PathPattern:
     converters: dict[str, type]
     segments_count: int
 
-    def match(self, path: str) -> dict[str, Any] | None:
+    def match(
+        self,
+        path: str
+    ) -> dict[str, Any] | None:
         """
         Match a path against this pattern and extract parameters.
 
@@ -52,7 +55,10 @@ class PathPattern:
 
         return params
 
-    def with_prefix(self, prefix: str) -> "PathPattern":
+    def with_prefix(
+        self,
+        prefix: str
+    ) -> "PathPattern":
         """
         Create a new PathPattern with a prefix prepended to the path.
 
@@ -66,7 +72,9 @@ class PathPattern:
         return compile_path(new_pattern_str)
 
 
-def compile_path(path: str) -> PathPattern:
+def compile_path(
+    path: str
+) -> PathPattern:
     """
     Compile a path template into a PathPattern for matching.
 

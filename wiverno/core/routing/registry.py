@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from typing import Any, ClassVar
 
+from wiverno.core.exceptions import RouteConflictError
 from wiverno.core.requests import Request
 from wiverno.core.exceptions import RouteConflictError
 from wiverno.core.routing.patterns import PathPattern, compile_path
@@ -36,14 +37,21 @@ class RouterRegistry:
         "CONNECT",
     ]
 
-    def __init__(self) -> None:
+    def __init__(
+        self
+    ) -> None:
         """
         Initialize an empty route registry.
         """
         self._static_routes: dict[str, dict[str, Handler]] = {}
         self._dynamic_routes: list[tuple[PathPattern, dict[str, Handler]]] = []
 
-    def register(self, path: str, handler: Handler, methods: list[str] | None = None) -> None:
+    def register(
+        self,
+        path: str,
+        handler: Handler,
+        methods: list[str] | None = None
+    ) -> None:
         """
         Register a route handler for the specified path and HTTP methods.
 
@@ -71,7 +79,9 @@ class RouterRegistry:
             self._register_static(normalized_path, handler, methods)
 
     def match(
-        self, path: str, method: str
+        self,
+        path: str,
+        method: str
     ) -> tuple[Handler | None, dict[str, Any] | None, bool | None]:
         """
         Find a handler for the given path and HTTP method.
@@ -107,7 +117,10 @@ class RouterRegistry:
 
         return None, None, None
 
-    def get_allowed_methods(self, path: str) -> set[str] | None:
+    def get_allowed_methods(
+        self,
+        path: str
+    ) -> set[str] | None:
         """
         Get the set of allowed HTTP methods for a given path.
 
@@ -128,7 +141,11 @@ class RouterRegistry:
 
         return None
 
-    def merge_from(self, other: "RouterRegistry", prefix: str = "") -> None:
+    def merge_from(
+        self,
+        other: "RouterRegistry",
+        prefix: str = ""
+    ) -> None:
         """
         Merge routes from another registry into this one, optionally with a prefix.
 
@@ -181,7 +198,10 @@ class RouterRegistry:
         self._sort_dynamic_routes()
 
     def _register_static(
-        self, path: str, handler: Handler, methods: list[str] | None = None
+        self,
+        path: str,
+        handler: Handler,
+        methods: list[str] | None = None
     ) -> None:
         """
         Register a static route (no path parameters).
@@ -212,7 +232,10 @@ class RouterRegistry:
             self._static_routes[path][method] = handler
 
     def _register_dynamic(
-        self, path: str, handler: Handler, methods: list[str] | None = None
+        self,
+        path: str,
+        handler: Handler,
+        methods: list[str] | None = None
     ) -> None:
         """
         Register a dynamic route (with path parameters).
@@ -262,7 +285,9 @@ class RouterRegistry:
         )
 
     @property
-    def static_routes(self) -> dict[str, dict[str, Handler]]:
+    def static_routes(
+        self
+    ) -> dict[str, dict[str, Handler]]:
         """
         Public read-only access to static routes.
 
@@ -272,7 +297,9 @@ class RouterRegistry:
         return self._static_routes
 
     @property
-    def dynamic_routes(self) -> list[tuple[PathPattern, dict[str, Handler]]]:
+    def dynamic_routes(
+        self
+    ) -> list[tuple[PathPattern, dict[str, Handler]]]:
         """
         Public read-only access to dynamic routes.
 
@@ -282,7 +309,9 @@ class RouterRegistry:
         return self._dynamic_routes
 
     @staticmethod
-    def normalize_path(path: str) -> str:
+    def normalize_path(
+        path: str
+    ) -> str:
         """
         Normalize a URL path to a canonical form.
 
@@ -309,7 +338,9 @@ class RouterRegistry:
         return path
 
     @staticmethod
-    def _normalize_path(path: str) -> str:
+    def _normalize_path(
+        path: str
+    ) -> str:
         """
         Internal wrapper for normalize_path.
 

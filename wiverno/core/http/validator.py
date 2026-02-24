@@ -12,7 +12,9 @@ class HTTPStatusValidator:
     """
 
     @staticmethod
-    def normalize_status(status: int | str) -> str:
+    def normalize_status(
+        status: int | str
+    ) -> str:
         """
         Normalize an HTTP status code to standard WSGI format.
 
@@ -63,5 +65,3 @@ class HTTPStatusValidator:
             raise ValueError(f"Unknown HTTP status code: {code}") from None
 
         return f"{code} {phrase}"
-
-
