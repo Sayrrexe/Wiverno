@@ -1,5 +1,4 @@
 import json
-from collections import UserDict
 from email.parser import BytesParser
 from email.policy import default
 from typing import Annotated, Any
@@ -8,7 +7,7 @@ from urllib.parse import parse_qs, unquote
 from annotated_doc import Doc
 
 
-class QueryDict(UserDict):
+class QueryDict(dict):
     """
     A dictionary subclass for handling query string parameters with support for multiple values.
 
