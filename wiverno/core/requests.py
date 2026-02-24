@@ -1,11 +1,14 @@
 import json
+from collections import UserDict
 from email.parser import BytesParser
 from email.policy import default
-from typing import Any
+from typing import Annotated, Any
 from urllib.parse import parse_qs, unquote
 
+from annotated_doc import Doc
 
-class QueryDict(dict):
+
+class QueryDict(UserDict):
     """
     A dictionary subclass for handling query string parameters with support for multiple values.
 
@@ -13,13 +16,23 @@ class QueryDict(dict):
         _list_data (dict[str, list[str]]): Internal storage for all parameter values.
     """
 
-    def __init__(self, query_string: str = "") -> None:
+    def __init__(
+        self,
+        query_string: Annotated[
+            str,
+            Doc(
+                """
+                URL query string to parse without the leading '?' character.
+                Supports multiple values for the same key (e.g., "key=val1&key=val2").
+                Empty values are preserved. Defaults to empty string.
+                """
+            )] = "",
+    ) -> None:
         """
         Initialize a QueryDict from a query string.
 
         Args:
-            query_string (str): URL query string to parse (without leading '?').
-                               Empty values are preserved. Defaults to empty string.
+            query_string: URL query string to parse (without leading '?').
         """
         super().__init__()
         self._list_data = {}
@@ -30,7 +43,11 @@ class QueryDict(dict):
                 self._list_data[key] = values
                 super().__setitem__(key, values[0] if values else "")
 
-    def get(self, key: str, default: Any = None) -> Any:
+    def get(
+        self,
+        key: str,
+        default: Any = None
+    ) -> Any:
         """
         Get the first value for a given key.
 
@@ -46,7 +63,11 @@ class QueryDict(dict):
         """
         return super().get(key, default)
 
-    def getlist(self, key: str, default: list[str] | None = None) -> list[str]:
+    def getlist(
+        self,
+        key: str,
+        default: list[str] | None = None
+    ) -> list[str]:
         """
         Get all values for a given key as a list.
 
@@ -60,7 +81,11 @@ class QueryDict(dict):
         """
         return self._list_data.get(key, default or [])
 
-    def __setitem__(self, key: str, value: Any) -> None:
+    def __setitem__(
+        self,
+        key: str,
+        value: Any
+    ) -> None:
         """
         Set a value for a given key, replacing any existing values.
 
@@ -87,7 +112,10 @@ class ParseBody:
     """
 
     @staticmethod
-    def get_request_params(environ: dict[str, Any], raw_data: bytes) -> dict[str, Any]:
+    def get_request_params(
+        environ: dict[str, Any],
+        raw_data: bytes
+    ) -> dict[str, Any]:
         """
         Parses POST request data from the WSGI environment.
 
@@ -131,7 +159,9 @@ class HeaderParser:
     """
 
     @staticmethod
-    def get_headers(environ: dict[str, Any]) -> dict[str, str]:
+    def get_headers(
+        environ: dict[str, Any]
+    ) -> dict[str, str]:
         """
         Parses headers from the WSGI environment.
 
@@ -187,12 +217,23 @@ class Request:
     is_secure: bool
     path_params: dict[str, Any]
 
-    def __init__(self, environ: dict[str, Any]) -> None:
+    def __init__(
+        self,
+        environ: Annotated[
+            dict[str, Any],
+            Doc(
+                """
+                The WSGI environment dictionary containing all request information
+                including HTTP method, path, headers, query string, and input stream.
+                This is typically provided by the WSGI server.
+                """
+            )],
+    ) -> None:
         """
         Initializes a Request object from a WSGI environment.
 
         Args:
-            environ (dict): The WSGI environment dictionary.
+            environ: The WSGI environment dictionary.
         """
         self.environ = environ
 
@@ -213,7 +254,9 @@ class Request:
         self.is_secure: bool = self.scheme == "https"
         self.path_params: dict[str, Any] = {}
 
-    def _get_path(self) -> str:
+    def _get_path(
+        self
+    ) -> str:
         """
         Extracts and normalizes the request path from the WSGI environment.
 
@@ -233,7 +276,9 @@ class Request:
 
         return path
 
-    def _parse_content_length(self) -> int:
+    def _parse_content_length(
+        self
+    ) -> int:
         """
         Parses the Content-Length header from the WSGI environment.
 
@@ -245,7 +290,9 @@ class Request:
         except (ValueError, TypeError):
             return 0
 
-    def _parse_cookies(self) -> dict[str, str]:
+    def _parse_cookies(
+        self
+    ) -> dict[str, str]:
         """
         Parses cookies from the HTTP_COOKIE header.
 

@@ -1,16 +1,18 @@
 import logging
 import traceback
 from collections.abc import Callable
-from typing import Any
+from typing import Annotated
+
+from annotated_doc import Doc
 
 from wiverno.core.config import WivernoConfig
 from wiverno.core.default_pages import InternalServerError500, MethodNotAllowed405, PageNotFound404
+from wiverno.core.http.validator import HTTPStatusValidator
 from wiverno.core.requests import Request
 from wiverno.core.routing.base import RouterMixin
 from wiverno.core.routing.registry import RouterRegistry
 from wiverno.core.routing.router import Router
 from wiverno.templating.templator import Templator
-from wiverno.core.http.validator import HTTPStatusValidator
 
 logger = logging.getLogger(__name__)
 
@@ -25,11 +27,47 @@ class Wiverno(RouterMixin):
 
     def __init__(
         self,
-        debug_mode: bool = True,
-        system_template_path: str = str(WivernoConfig.DEFAULT_TEMPLATE_PATH),
-        page_404: Callable[[Request], tuple[str, str]] = PageNotFound404(),
-        page_405: Callable[[Request], tuple[str, str]] = MethodNotAllowed405(),
-        page_500: Callable[[Request, str | None], tuple[str, str]] = InternalServerError500(),
+        debug_mode: Annotated[
+            bool,
+            Doc(
+                """
+                Enable or disable debug mode. When True, detailed error
+                pages with tracebacks are shown. Defaults to True.
+                """
+            )] = True,
+        system_template_path: Annotated[
+            str,
+            Doc(
+                """
+                Path to the directory containing system templates for error
+                pages (404, 405, 500). Can be absolute or relative to cwd.
+                """
+            )] = str(WivernoConfig.DEFAULT_TEMPLATE_PATH),
+        page_404: Annotated[
+            Callable[[Request], tuple[str, str]],
+            Doc(
+                """
+                Custom handler for 404 Not Found errors. Should return
+                a tuple of (status, body). Defaults to built-in handler.
+                """
+            )] = PageNotFound404(),
+        page_405: Annotated[
+            Callable[[Request], tuple[str, str]],
+            Doc(
+                """
+                Custom handler for 405 Method Not Allowed errors. Should
+                return a tuple of (status, body). Defaults to built-in handler.
+                """
+            )] = MethodNotAllowed405(),
+        page_500: Annotated[
+            Callable[[Request, str | None], tuple[str, str]],
+            Doc(
+                """
+                Custom handler for 500 Internal Server errors. Receives
+                optional error traceback. Should return (status, body).
+                Defaults to built-in handler.
+                """
+            )] = InternalServerError500(),
     ) -> None:
         """
         Initializes the Wiverno application with a list of routes.
@@ -50,7 +88,9 @@ class Wiverno(RouterMixin):
         self.page_500 = page_500
 
     @property
-    def _registry(self) -> RouterRegistry:
+    def _registry(
+        self
+    ) -> RouterRegistry:
         """
         Get the RouterRegistry instance for this application.
 
@@ -59,7 +99,11 @@ class Wiverno(RouterMixin):
         """
         return self.__registry
 
-    def include_router(self, router: Router, prefix: str = "") -> None:
+    def include_router(
+        self,
+        router: Router,
+        prefix: str = ""
+    ) -> None:
         """
         Include routes from a Router instance into this application.
 
@@ -72,7 +116,9 @@ class Wiverno(RouterMixin):
         self.__registry.merge_from(router.registry, prefix)
 
     def __call__(
-        self, environ: dict[str, Any], start_response: Callable[[str, list[tuple[str, str]]], None]
+        self,
+        environ: dict[str, object],
+        start_response: Callable[[str, list[tuple[str, str]]], None]
     ) -> list[bytes]:
         """
         WSGI application entry point.
@@ -121,5 +167,3 @@ class Wiverno(RouterMixin):
         start_response(status, [("Content-Type", "text/html; charset=utf-8")])
 
         return [body.encode("utf-8")]
-    
-        

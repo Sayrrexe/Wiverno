@@ -11,8 +11,9 @@ import sys
 import time
 from pathlib import Path
 from threading import Event, Thread
-from typing import Any
+from typing import Annotated
 
+from annotated_doc import Doc
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
@@ -34,9 +35,32 @@ class DebounceHandler(FileSystemEventHandler):
 
     def __init__(
         self,
-        restart_callback: Any,
-        debounce_seconds: float = 1.0,
-        ignore_patterns: list[str] | None = None,
+        restart_callback: Annotated[
+            object,
+            Doc(
+                """
+                Callback function to invoke when file changes are detected
+                and the debounce period has elapsed.
+                """
+            )],
+        debounce_seconds: Annotated[
+            float,
+            Doc(
+                """
+                Minimum time in seconds to wait after the last file change
+                before triggering the restart callback. Helps prevent
+                excessive restarts during rapid file modifications.
+                """
+            )] = 1.0,
+        ignore_patterns: Annotated[
+            list[str] | None,
+            Doc(
+                """
+                List of file path patterns to ignore. Files matching these
+                patterns won't trigger a restart. Common patterns include
+                __pycache__, .venv, .git, and test directories.
+                """
+            )] = None,
     ) -> None:
         """
         Initialize the debounce handler.
@@ -54,7 +78,10 @@ class DebounceHandler(FileSystemEventHandler):
         self._pending_event: Event = Event()
         self._debounce_thread: Thread | None = None
 
-    def _should_ignore(self, path: str) -> bool:
+    def _should_ignore(
+        self,
+        path: str
+    ) -> bool:
         """
         Check if a path should be ignored based on patterns.
 
@@ -74,7 +101,9 @@ class DebounceHandler(FileSystemEventHandler):
                 return True
         return False
 
-    def _debounce_restart(self) -> None:
+    def _debounce_restart(
+        self
+    ) -> None:
         """Execute restart after debounce period."""
         time.sleep(self.debounce_seconds)
         if self._pending_event.is_set():
@@ -84,7 +113,10 @@ class DebounceHandler(FileSystemEventHandler):
                 self._pending_event.clear()
                 self.restart_callback()
 
-    def on_modified(self, event: FileSystemEvent) -> None:
+    def on_modified(
+        self,
+        event: FileSystemEvent
+    ) -> None:
         """
         Handle file modification events.
 
@@ -119,13 +151,68 @@ class DevServer:
 
     def __init__(
         self,
-        app_module: str,
-        app_name: str = "app",
-        host: str = "localhost",
-        port: int = 8000,
-        watch_dirs: list[str] | None = None,
-        ignore_patterns: list[str] | None = None,
-        debounce_seconds: float = 1.0,
+        app_module: Annotated[
+            str,
+            Doc(
+                """
+                Module path containing the WSGI application to run.
+                For example, if your app is in 'run.py', use 'run'.
+                The module should contain a WSGI application callable.
+                """
+            )],
+        app_name: Annotated[
+            str,
+            Doc(
+                """
+                Name of the application variable within the module.
+                Defaults to 'app'. For example, if your app is defined
+                as 'my_app = Wiverno()', use 'my_app'.
+                """
+            )] = "app",
+        host: Annotated[
+            str,
+            Doc(
+                """
+                Server host address to bind to. Use '0.0.0.0' to accept
+                connections from any interface, or 'localhost' for local only.
+                Defaults to 'localhost'.
+                """
+            )] = "localhost",
+        port: Annotated[
+            int,
+            Doc(
+                """
+                Server port number. Must be between 1 and 65535.
+                Defaults to 8000.
+                """
+            )] = 8000,
+        watch_dirs: Annotated[
+            list[str] | None,
+            Doc(
+                """
+                List of directories to watch for file changes. If None,
+                watches the current working directory recursively.
+                Defaults to None (watches cwd).
+                """
+            )] = None,
+        ignore_patterns: Annotated[
+            list[str] | None,
+            Doc(
+                """
+                List of file path patterns to ignore when watching for changes.
+                Common patterns include __pycache__, .venv, .git, and test dirs.
+                Defaults to a sensible list of common ignore patterns.
+                """
+            )] = None,
+        debounce_seconds: Annotated[
+            float,
+            Doc(
+                """
+                Minimum time in seconds to wait after the last file change
+                before triggering a restart. Helps prevent excessive restarts
+                during rapid file modifications. Defaults to 1.0 second.
+                """
+            )] = 1.0,
     ) -> None:
         """
         Initialize the development server.
@@ -161,7 +248,9 @@ class DevServer:
         self.observer: Observer | None = None
         self._restart_count = 0
 
-    def _get_debug_mode(self) -> str:
+    def _get_debug_mode(
+        self
+    ) -> str:
         """
         Get debug mode status from the application.
 
@@ -179,7 +268,9 @@ class DevServer:
         except (ImportError, AttributeError):
             return "[dim]Unknown[/dim]"
 
-    def _start_server_process(self) -> None:
+    def _start_server_process(
+        self
+    ) -> None:
         """Start the WSGI server process."""
         if self.process:
             self._stop_server_process()
@@ -217,7 +308,10 @@ server.start()
             [sys.executable, "-u", "-c", python_code],
         )
 
-    def _stop_server_process(self, show_restart_message: bool = True) -> None:
+    def _stop_server_process(
+        self,
+        show_restart_message: bool = True
+    ) -> None:
         """Stop the WSGI server process.
 
         Args:
@@ -233,13 +327,17 @@ server.start()
                 self.process.kill()
             self.process = None
 
-    def _restart_server(self) -> None:
+    def _restart_server(
+        self
+    ) -> None:
         """Restart the server after file changes."""
         console.print("[yellow]>> Server restarting...[/yellow]")
         self._stop_server_process(show_restart_message=False)
         self._start_server_process()
 
-    def _start(self) -> None:
+    def _start(
+        self
+    ) -> None:
         """
         Start the development server with hot reload (internal method).
 
@@ -280,7 +378,9 @@ server.start()
             console.print("\n[bold red]>> Stopping development server...[/bold red]")
             self.stop()
 
-    def stop(self) -> None:
+    def stop(
+        self
+    ) -> None:
         """Stop the development server and file watcher."""
         if self.observer:
             self.observer.stop()
