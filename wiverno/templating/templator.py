@@ -1,6 +1,7 @@
 from pathlib import Path
-from typing import Any
+from typing import Annotated
 
+from annotated_doc import Doc
 from jinja2 import Environment, FileSystemLoader
 
 
@@ -12,7 +13,18 @@ class Templator:
     from a specified folder.
     """
 
-    def __init__(self, folder: str | Path = "templates") -> None:
+    def __init__(
+        self,
+        folder: Annotated[
+            str | Path,
+            Doc(
+                """
+                Path to the directory containing Jinja2 templates. Can be
+                specified as a string (relative or absolute path) or as
+                a Path object. Defaults to "templates" folder.
+                """
+            )] = "templates"
+    ) -> None:
         """
         Initializes the Templator with a template folder.
 
@@ -32,7 +44,9 @@ class Templator:
         self.env.loader = FileSystemLoader(str(template_dir))
 
     def render(
-        self, template_name: str, content: dict[str, Any] | None = None, **kwargs: Any
+        self,
+        template_name: str, content: dict[str, object] | None = None,
+        **kwargs: object
     ) -> str:
         """
         Renders a template with the given context.

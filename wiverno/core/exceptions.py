@@ -5,6 +5,10 @@ This module defines custom exceptions used throughout the framework
 for error handling and control flow.
 """
 
+from typing import Annotated
+
+from annotated_doc import Doc
+
 
 class RouteConflictError(Exception):
     """
@@ -14,6 +18,7 @@ class RouteConflictError(Exception):
     - The same path and HTTP method combination is already registered
     - Overlapping method sets are registered for the same path
     """
+
 
 class InvalidHTTPStatusError(Exception):
     """
@@ -28,7 +33,19 @@ class InvalidHTTPStatusError(Exception):
     attribute so that callers can log or transform it if they wish.
     """
 
-    def __init__(self, status: str | None = None) -> None:
+    def __init__(
+        self,
+        status: Annotated[
+            str | None,
+            Doc(
+                """
+                The invalid HTTP status value that was provided. This can be
+                any value that doesn't conform to the WSGI status line format
+                (e.g., an integer, empty string, tuple, or malformed string).
+                If None is provided, defaults to "unknown".
+                """
+            )] = None,
+    ) -> None:
         """
         Initialize the exception with the invalid status value.
 

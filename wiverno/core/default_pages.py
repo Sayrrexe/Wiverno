@@ -14,7 +14,10 @@ class PageNotFound404:
     Default 404 error handler that renders the error_404.html template.
     """
 
-    def __call__(self, _request: Request) -> tuple[str, str]:
+    def __call__(
+        self,
+        _request: Request
+    ) -> tuple[str, str]:
         """
         Handles 404 Not Found errors.
 
@@ -33,7 +36,10 @@ class MethodNotAllowed405:
     Default 405 error handler that renders the error_405.html template.
     """
 
-    def __call__(self, request: Request) -> tuple[str, str]:
+    def __call__(
+        self,
+        request: Request
+    ) -> tuple[str, str]:
         """
         Handles 405 Method Not Allowed errors.
 
@@ -54,7 +60,11 @@ class InternalServerError500:
     Default 500 error handler that renders the error_500.html template.
     """
 
-    def __call__(self, _request: Request, error_traceback: str | None = None) -> tuple[str, str]:
+    def __call__(
+        self,
+        _request: Request,
+        error_traceback: str | None = None
+    ) -> tuple[str, str]:
         """
         Handles 500 Internal Server Error.
 

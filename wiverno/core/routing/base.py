@@ -32,7 +32,11 @@ class RouterMixin(ABC):
             This is an abstract property that must be implemented by subclasses.
         """
 
-    def route(self, path: str, methods: list[str] | None = None) -> Callable[[Handler], Handler]:
+    def route(
+        self,
+        path: str,
+        methods: list[str] | None = None
+    ) -> Callable[[Handler], Handler]:
         """
         Register a route handler for the specified path and HTTP methods.
 
@@ -46,13 +50,18 @@ class RouterMixin(ABC):
             A decorator function that registers the handler and returns it unchanged.
         """
 
-        def decorator(func: Handler) -> Handler:
+        def decorator(
+            func: Handler
+        ) -> Handler:
             self._registry.register(path, func, methods)
             return func
 
         return decorator
 
-    def get(self, path: str) -> Callable[[Handler], Handler]:
+    def get(
+        self,
+        path: str
+    ) -> Callable[[Handler], Handler]:
         """
         Register a GET route handler.
 
@@ -64,7 +73,10 @@ class RouterMixin(ABC):
         """
         return self.route(path, methods=["GET"])
 
-    def post(self, path: str) -> Callable[[Handler], Handler]:
+    def post(
+        self,
+        path: str
+    ) -> Callable[[Handler], Handler]:
         """
         Register a POST route handler.
 
@@ -76,7 +88,10 @@ class RouterMixin(ABC):
         """
         return self.route(path, methods=["POST"])
 
-    def put(self, path: str) -> Callable[[Handler], Handler]:
+    def put(
+        self,
+        path: str
+    ) -> Callable[[Handler], Handler]:
         """
         Register a PUT route handler.
 
@@ -88,7 +103,10 @@ class RouterMixin(ABC):
         """
         return self.route(path, methods=["PUT"])
 
-    def patch(self, path: str) -> Callable[[Handler], Handler]:
+    def patch(
+        self,
+        path: str
+    ) -> Callable[[Handler], Handler]:
         """
         Register a PATCH route handler.
 
@@ -100,7 +118,10 @@ class RouterMixin(ABC):
         """
         return self.route(path, methods=["PATCH"])
 
-    def delete(self, path: str) -> Callable[[Handler], Handler]:
+    def delete(
+        self,
+        path: str
+    ) -> Callable[[Handler], Handler]:
         """
         Register a DELETE route handler.
 
@@ -112,7 +133,10 @@ class RouterMixin(ABC):
         """
         return self.route(path, methods=["DELETE"])
 
-    def head(self, path: str) -> Callable[[Handler], Handler]:
+    def head(
+        self,
+        path: str
+    ) -> Callable[[Handler], Handler]:
         """
         Register a HEAD route handler.
 
@@ -124,7 +148,10 @@ class RouterMixin(ABC):
         """
         return self.route(path, methods=["HEAD"])
 
-    def options(self, path: str) -> Callable[[Handler], Handler]:
+    def options(
+        self,
+        path: str
+    ) -> Callable[[Handler], Handler]:
         """
         Register an OPTIONS route handler.
 
@@ -136,7 +163,10 @@ class RouterMixin(ABC):
         """
         return self.route(path, methods=["OPTIONS"])
 
-    def connect(self, path: str) -> Callable[[Handler], Handler]:
+    def connect(
+        self,
+        path: str
+    ) -> Callable[[Handler], Handler]:
         """
         Register a CONNECT route handler.
 
@@ -148,7 +178,10 @@ class RouterMixin(ABC):
         """
         return self.route(path, methods=["CONNECT"])
 
-    def trace(self, path: str) -> Callable[[Handler], Handler]:
+    def trace(
+        self,
+        path: str
+    ) -> Callable[[Handler], Handler]:
         """
         Register a TRACE route handler.
 

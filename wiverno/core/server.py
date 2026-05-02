@@ -2,8 +2,10 @@ import logging
 import signal
 import sys
 from collections.abc import Callable
-from typing import Any
+from typing import Annotated, Any
 from wsgiref.simple_server import WSGIServer, make_server
+
+from annotated_doc import Doc
 
 logger = logging.getLogger(__name__)
 
@@ -33,10 +35,41 @@ class RunServer:
 
     def __init__(
         self,
-        application: Callable[..., Any],
-        host: str = "localhost",
-        port: int = 8000,
-        request_queue_size: int = 5,
+        application: Annotated[
+            Callable[..., Any],
+            Doc(
+                """
+                A WSGI-compatible application to serve. This should be a callable
+                that follows the WSGI specification (receives environ and
+                start_response arguments).
+                """
+            )],
+        host: Annotated[
+            str,
+            Doc(
+                """
+                Host address to bind the server to. Use '0.0.0.0' to bind to
+                all available interfaces, or 'localhost' for local connections only.
+                Defaults to 'localhost'.
+                """
+            )] = "localhost",
+        port: Annotated[
+            int,
+            Doc(
+                """
+                Port number to bind the server to. Must be between 1 and 65535.
+                Defaults to 8000.
+                """
+            )] = 8000,
+        request_queue_size: Annotated[
+            int,
+            Doc(
+                """
+                Maximum number of pending connections in the server's request queue.
+                Increasing this value allows more simultaneous connections but uses
+                more memory. Defaults to 5.
+                """
+            )] = 5,
     ) -> None:
         """
         Initializes the server with application, host, and port.
@@ -54,12 +87,18 @@ class RunServer:
         self._httpd: WSGIServer | None = None
         self._setup_signal_handlers()
 
-    def _setup_signal_handlers(self) -> None:
+    def _setup_signal_handlers(
+        self
+    ) -> None:
         """Setup signal handlers for graceful shutdown."""
         signal.signal(signal.SIGINT, self._handle_shutdown)
         signal.signal(signal.SIGTERM, self._handle_shutdown)
 
-    def _handle_shutdown(self, signum: int, frame: Any) -> None:
+    def _handle_shutdown(
+        self,
+        signum: int,
+        frame: Any
+    ) -> None:
         """
         Handle shutdown signals gracefully.
 
@@ -72,7 +111,9 @@ class RunServer:
         self.stop()
         sys.exit(0)
 
-    def start(self) -> None:
+    def start(
+        self
+    ) -> None:
         """
         Starts the WSGI server and serves the application forever.
 
@@ -113,7 +154,9 @@ class RunServer:
             self.stop()
             raise
 
-    def stop(self) -> None:
+    def stop(
+        self
+    ) -> None:
         """
         Stop the server gracefully.
 
